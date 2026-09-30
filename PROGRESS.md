@@ -1,6 +1,7 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Screenshot review caught world-label stacking above the HUD/overlays; lowered all world labels beneath UI panels and checked TypeScript/lint.
 - First cooperative chamber is playable end-to-end: physical gate, glowing shared plate, E-activated core, evolving tutorial hints, actual recorded echoes, reset effect, and victory/replay screen.
 - Verified in Chromium without teleporting or scripting echoes: discover plate → leave it → collide with shut gate → record a partial run ending on plate → past self replays and holds → current self crosses → core activation → victory → clean restart.
 - Full milestone validation: TypeScript, lint, 44 unit tests, production build, all four browser tests pass.

@@ -18,6 +18,6 @@ export function ObjectiveCore({ runtime }: { runtime: GameRuntime }) {
   return <group position={[position.x, position.y, position.z]}>
     <mesh ref={core}><octahedronGeometry args={[.6]} /><meshStandardMaterial ref={material} color="#d6b2ff" emissive="#b281ff" emissiveIntensity={.65} metalness={.25} roughness={.2} /></mesh>
     <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.95, .018, 8, 48]} /><meshBasicMaterial color="#b281ff" /></mesh>
-    <Html position={[0, 1.1, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}><span className="world-label objective-label">TEMPORAL CORE<small>E / STABILIZE</small></span></Html>
+    <Html position={[0, 1.1, 0]} center distanceFactor={12} zIndexRange={[1, 0]} style={{ pointerEvents: "none" }}><span className="world-label objective-label">TEMPORAL CORE<small>E / STABILIZE</small></span></Html>
   </group>;
 }

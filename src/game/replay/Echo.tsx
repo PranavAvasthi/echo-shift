@@ -19,7 +19,7 @@ function Echo({ recording, runtime }: { recording: RecordedRun; runtime: GameRun
   });
   return <group ref={model}>
     <CharacterBody motion={replay.pose} clock={runtime.clock} holographic />
-    <Html position={[0, 1.2, 0]} center distanceFactor={8} style={{ pointerEvents: "none" }}>
+    <Html position={[0, 1.2, 0]} center distanceFactor={8} zIndexRange={[1, 0]} style={{ pointerEvents: "none" }}>
       <span className="echo-label" data-testid={`echo-${recording.runId}`}>ECHO {String(recording.runId).padStart(2, "0")}<small>YOUR PREVIOUS RUN</small></span>
     </Html>
   </group>;
