@@ -12,6 +12,21 @@ function run() {
 }
 
 describe("recorded echo playback", () => {
+  it("reuses pose storage throughout a full run with irregular render timing", () => {
+    const recorder = new ReplayRecorder();
+    recorder.start(1, "tutorial", pose());
+    for (let step = 1; step <= 1800; step++) recorder.observe(step / 60, pose(step / 60));
+    const replay = new ReplayPlayer(recorder.finish("timeout"));
+    const original = replay.pose;
+    const position = original.position;
+    const rotation = original.rotation;
+    for (const time of [0, .001, .737, 10.013, 18.9, 29.999, 30, 35, .2]) {
+      expect(replay.sample(time)).toBe(original);
+      expect(replay.pose.position).toBe(position);
+      expect(replay.pose.rotation).toBe(rotation);
+      expect(replay.pose.position.x).toBeCloseTo(Math.min(time, 30), 8);
+    }
+  });
   it("interpolates exact positions between timestamped frames", () => {
     const replay = new ReplayPlayer(run());
     expect(replay.sample(.02).position.x).toBeCloseTo(2);

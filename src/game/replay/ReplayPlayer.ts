@@ -1,4 +1,4 @@
-import { Quaternion } from "three";
+import { MathUtils, Quaternion } from "three";
 import type { PlayerPose, RecordedAction, RecordedRun } from "./replay.types";
 
 /** Pure timestamp-based playback. No physics body, frame-rate assumptions or scripted paths. */
@@ -33,17 +33,21 @@ export class ReplayPlayer {
     const a = frames[low];
     const b = frames[Math.min(low + 1, frames.length - 1)];
     const alpha = b.time > a.time ? Math.min(1, (t - a.time) / (b.time - a.time)) : 0;
-    const lerp = (start: number, end: number) => start + (end - start) * alpha;
-    this.pose.position.x = lerp(a.position.x, b.position.x);
-    this.pose.position.y = lerp(a.position.y, b.position.y);
-    this.pose.position.z = lerp(a.position.z, b.position.z);
+    // Playback runs for every echo every frame; reuse pose/quaternion storage
+    // and avoid creating a closure or temporary transform object per sample.
+    this.pose.position.x = MathUtils.lerp(a.position.x, b.position.x, alpha);
+    this.pose.position.y = MathUtils.lerp(a.position.y, b.position.y, alpha);
+    this.pose.position.z = MathUtils.lerp(a.position.z, b.position.z, alpha);
     this.a.set(a.rotation.x, a.rotation.y, a.rotation.z, a.rotation.w);
     this.b.set(b.rotation.x, b.rotation.y, b.rotation.z, b.rotation.w);
     this.rotation.slerpQuaternions(this.a, this.b, alpha).normalize();
-    Object.assign(this.pose.rotation, { x: this.rotation.x, y: this.rotation.y, z: this.rotation.z, w: this.rotation.w });
-    this.pose.velocity.x = lerp(a.velocity.x, b.velocity.x);
-    this.pose.velocity.y = lerp(a.velocity.y, b.velocity.y);
-    this.pose.velocity.z = lerp(a.velocity.z, b.velocity.z);
+    this.pose.rotation.x = this.rotation.x;
+    this.pose.rotation.y = this.rotation.y;
+    this.pose.rotation.z = this.rotation.z;
+    this.pose.rotation.w = this.rotation.w;
+    this.pose.velocity.x = MathUtils.lerp(a.velocity.x, b.velocity.x, alpha);
+    this.pose.velocity.y = MathUtils.lerp(a.velocity.y, b.velocity.y, alpha);
+    this.pose.velocity.z = MathUtils.lerp(a.velocity.z, b.velocity.z, alpha);
     // A partial recording holds its exact last position. It does not invent a
     // path back to spawn or keep walking beyond what the user recorded.
     this.pose.animation = time > this.run.duration ? "idle" : a.animation;

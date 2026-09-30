@@ -1,6 +1,7 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Removed per-sample replay closures/temporary rotation objects and reused camera intersection storage. Full 30-second playback is tested at irregular timestamps and rewind while preserving pose storage. TypeScript, lint, 59 unit tests, and production build pass; final browser regressions are running.
 - Vertical-slice temporal presentation: staged opaque reset curtain and reveal fade, newest-echo cyan scan/opacity materialization, first-reveal messaging, and numbered timeline entries reflecting actual retained recordings. Presentation never delays recorded movement or shared occupancy; reduced motion removes scan/flicker/caption animation. Browser checks now verify reset freeze, reveal messaging, timeline labels, and sound volume. TypeScript, lint, 58 unit tests, production build, and all four browser tests pass.
 - Original Web Audio feedback for footsteps, landing, plate edges, gate changes, temporal reset, echo appearance, core completion, and a quiet facility hum. Audio starts only on a user gesture, pauses/mutes with simulation, caps transient voices at twelve, and disposes on route exit. Existing pause panel has a session-only volume slider. Validation: 56 unit tests, TypeScript, lint, production build, and all four real-browser checks pass.
 - Vertical-slice movement pass: 90ms coyote time, 120ms jump buffering, reset cleanup, smoothed camera aim, immediate wall retraction, and projection updates only when FOV changes. TypeScript, lint, and 51 unit tests pass.
@@ -35,7 +36,7 @@
 
 ## Remaining
 - Reusable switches, cube relay, security timing, and remaining campaign levels.
-- Remaining campaign, final facility art, original audio, full settings, and profiling.
+- Remaining campaign, final facility art, mastered spatial audio/soundtrack, full settings, and broad GPU/browser profiling.
 
 ## Architecture decisions
 - Gameplay simulation lives outside React UI; mutable transforms use refs.
@@ -44,6 +45,8 @@
 - Primitive character/environment remain replaceable. Visual work stays minimal until the echo puzzle works.
 - TypeScript 5.9 is pinned because the current lint parser does not support TypeScript 7.
 - Transform samples come from post-physics observations. Actions retain their own timestamp stream and are never quantized to transform samples.
+- Reset/reveal effects are presentation-only: they cannot shift recorded timestamps, invent movements, or delay puzzle occupancy. Reduced motion removes the echo scan/flicker.
+- Audio is original procedural Web Audio, gesture-unlocked and bounded to twelve transient voices. Volume/preferences remain in memory; no additional assets or dependencies were introduced.
 - Partial runs retain their precise final frame; actual playback holds that endpoint so deliberately short plate recordings work. No scripted clones are used.
 - A newly mounted game route starts fresh state; leaving the game route disposes its runtime. Preferences remain in memory only.
 - Chamber changes clear local recordings and entity occupancy while retaining session time/loop totals. A full timeline restart clears both chambers and all session totals.
@@ -53,4 +56,5 @@
 - Environment remains a deliberately small grey-box prototype; final facility art, spatial audio, campaign, and profiling remain unfinished.
 - Browser tests use full headless Chromium (`channel: chromium`). The smaller headless-shell rejected native pointer lock; full Chromium now verifies it without capturing the desktop mouse.
 - R3F currently emits a single upstream Three.js Clock deprecation notice; Rapier emits a single WASM initialization deprecation notice. No application runtime errors observed.
+- Development route teardown also reports a React synchronous-unmount warning from Drei Html's nested DOM-root cleanup. No uncaught errors or failing cleanup/re-entry checks; dependency warnings are documented, not suppressed.
 - Two playable chambers are complete; the full five-level campaign is still in development.

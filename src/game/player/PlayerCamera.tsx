@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { MathUtils, Mesh, PerspectiveCamera, Raycaster, Vector3 } from "three";
+import { MathUtils, Mesh, PerspectiveCamera, Raycaster, Vector3, type Intersection } from "three";
 import type { GameRuntime } from "@/game/core/GameRuntime";
 import { useGameStore } from "@/game/state/gameStore";
 
 export function PlayerCamera({ runtime }: { runtime: GameRuntime }) {
   const { camera, scene, gl } = useThree();
-  const scratch = useMemo(() => ({ target: new Vector3(), follow: new Vector3(), ideal: new Vector3(), direction: new Vector3(), ray: new Raycaster() }), []);
+  const scratch = useMemo(() => ({ target: new Vector3(), follow: new Vector3(), ideal: new Vector3(), direction: new Vector3(), ray: new Raycaster(), hits: [] as Intersection[] }), []);
   const obstacles = useRef<Mesh[]>([]);
   const snap = useRef(true);
   const resetVersion = useGameStore((s) => s.resetVersion);
@@ -34,7 +34,9 @@ export function PlayerCamera({ runtime }: { runtime: GameRuntime }) {
     const rayLength = direction.length();
     ray.set(target, direction.normalize());
     ray.far = rayLength;
-    const hits = ray.intersectObjects(obstacles.current, false);
+    const hits = scratch.hits;
+    hits.length = 0;
+    ray.intersectObjects(obstacles.current, false, hits);
     if (hits.length) ideal.copy(target).addScaledVector(ray.ray.direction, Math.max(.4, hits[0].distance - .18));
     // Retract immediately at a wall; damping inward would briefly clip through it.
     if (snap.current || (hits.length && camera.position.distanceTo(target) > ideal.distanceTo(target))) { camera.position.copy(ideal); snap.current = false; }
