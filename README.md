@@ -12,6 +12,8 @@ The mounted game route owns the timeline. Leaving that route ends the session; r
 
 The core mechanic is playable: **record yourself, reset, cooperate with your actual past self, reach the core**. Both chambers have physical gates, shared pressure plates, evolving hints, time limits, and completion screens. The environment remains deliberately simple while the full five-level campaign is developed.
 
+The current vertical-slice pass focuses entirely on the first chamber: forgiving responsive jumps, smooth collision-aware camera follow, staged reset/reveal, numbered real-echo timeline, and original procedural sound feedback. The existing Dual Core chamber remains available, but no levels were added during this pass.
+
 ![An actual recorded echo holds Plate A while the current player approaches the open gate](public/screenshots/cooperation-echo.png)
 
 ![Two previous selves power both plates in Dual Core](public/screenshots/dual-core-echoes.png)
@@ -30,6 +32,8 @@ Implemented:
 - Shared pressure plate occupancy, physical gate collision, contextual E interaction, evolving tutorial hints, and two-chamber progression.
 - Session landing, loading/error screens, controls, HUD, camera settings, reset effect, completion statistics, and desktop-only gameplay notice.
 - Automated unit and real-browser integration checks.
+- Buffered/coyote-time jumping, immediate camera wall retraction, cyan scan materialization, and reduced-motion handling without delaying replay.
+- Gesture-unlocked procedural facility hum, footsteps, landings, plate/gate feedback, reset/reveal, and completion cues, with session-only volume control.
 
 ## Local development
 
@@ -66,7 +70,7 @@ npm run test:browser
 
 The development server starts automatically, or an existing localhost:3000 server is reused. Browser tests use the development-only telemetry panel. They must not target a production server. The renderer needs a working WebGL2 implementation; software renderers can be slower than normal desktop gameplay.
 
-Current verification: strict TypeScript, ESLint, production build, 49 unit tests, and four browser tests. The cooperative browser playthrough solves both chambers in five loops using real keyboard movement, checks closed-door collision, waits for actual echo endpoints, activates both cores, and verifies a clean restart. It does not teleport actors or inject scripted ghost paths.
+Current verification: strict TypeScript, ESLint, production build, 59 unit tests, and four browser tests. The cooperative browser playthrough solves both chambers in five loops using real keyboard movement, checks closed-door collision, reset freeze, reveal messaging, actual echo endpoints, timeline labels, sound controls, both cores, and a clean restart. It does not teleport actors or inject scripted ghost paths.
 
 ## Controls
 
@@ -81,7 +85,7 @@ Current verification: strict TypeScript, ESLint, production build, 49 unit tests
 | Esc | Pause and release mouse |
 | Backtick | Development-only telemetry |
 
-The pause panel includes sensitivity, invert Y, reduced camera motion, current-run reset, and confirmed timeline restart. Music/SFX/graphics controls are deferred until their systems exist.
+The pause panel includes sensitivity, invert Y, reduced camera motion, sound volume (zero mutes), current-run reset, and confirmed timeline restart. Separate music/SFX buses and graphics presets are deferred until their systems exist.
 
 ## Architecture
 
@@ -113,6 +117,10 @@ The game runtime owns frame-level mutable data. React manages structure and phas
 
 The phase machine rejects invalid transitions. Blur, pointer-lock loss, and hidden tabs pause simulation and clear held inputs. A reset freezes simulation, captures once, waits 1.2 seconds, resets the player/clock/recorder, and resumes only if mouse capture and document visibility are intact.
 
+Reset presentation fades to an opaque curtain before replacing the world, then reveals it smoothly. The newest echo's cyan scan/opacity reveal uses elapsed simulation seconds and never delays or offsets its recorded movement or puzzle occupancy. Reduced motion removes the scan/flicker and caption animation.
+
+Sound is synthesized locally with Web Audio oscillators and short gain envelopes. Plate cues pan relative to the camera; footsteps depend on actual distance travelled, not just held input. A maximum of twelve transient voices prevents accumulation. Pauses fade the mix to silence; leaving the game closes the audio context. These are original procedural cues, not final mastered audio or a soundtrack.
+
 ## Recording design
 
 Physics supplies timestamped observations. The recorder resamples between adjacent observations onto exact `sampleIndex / 25` timestamps, using linear position/velocity interpolation and shortest-arc quaternion slerp. It does not attach an old timestamp to a newer position or assume render FPS matches sampling FPS.
@@ -131,11 +139,12 @@ Completed recordings retain only plain serializable numbers and labels, never Th
 - Imperative transform/model animation updates; no per-frame React state updates.
 - A single shadow-casting light, capped 1.5 DPR, modest shadow resolution, and primitive geometry.
 - Reused camera vectors/raycaster and recorder quaternion scratch objects.
+- Reused camera intersection results, skipped unchanged projection updates, and allocation-free shared hologram opacity updates.
 - Bounded archive memory and cleaned-up input listeners, timers, and Rapier character controller.
 - Lazy-loaded game renderer. No remote models/textures are needed to initialize gameplay.
 - Cosmetic Google web fonts have system fallbacks; simulation has no external API dependency.
 
-60 FPS with the final environment and multiple echoes is a target, not a measured claim for this foundation. Broad GPU/browser profiling belongs to Phase 11.
+60 FPS with the final environment and multiple echoes is a target, not a measured claim for this prototype. Broad GPU/browser profiling remains outstanding.
 
 ## Deployment
 
@@ -144,10 +153,11 @@ Import the repository into Vercel as a Next.js project. The normal `npm run buil
 ## Known limitations and next milestones
 
 - Two chambers are playable. The remaining cube relay, timed security, and final multi-echo choreography are still to be built.
-- Final facility art, spatial audio, postprocessing, and advanced reset effects remain unfinished.
+- Final facility art, mastered/spatial audio, a soundtrack, and postprocessing remain unfinished. Current procedural cues and reset/reveal effects are implemented.
 - Primitive operative and laboratory are intentional replaceable grey-box assets.
 - Desktop Chromium has been exercised; Safari/Firefox/Edge validation remains outstanding.
 - Current R3F emits one upstream Three.js Clock deprecation warning; Rapier emits one WASM initializer deprecation warning. These are not application errors and are not suppressed.
+- Development route teardown also reports a React synchronous-unmount warning from Drei Html's nested DOM-root cleanup. Route disposal/re-entry passes without uncaught errors; this dependency warning remains documented.
 - Mobile gameplay is intentionally unavailable. WebGL2 is the current Three.js baseline.
 
 See [PROGRESS.md](PROGRESS.md) for milestone status and architecture decisions. Git commits preserve the verified development sequence.

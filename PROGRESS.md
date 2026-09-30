@@ -1,7 +1,7 @@
 # ECHO//SHIFT — development log
 
 ## Completed
-- Removed per-sample replay closures/temporary rotation objects and reused camera intersection storage. Full 30-second playback is tested at irregular timestamps and rewind while preserving pose storage. TypeScript, lint, 59 unit tests, and production build pass; final browser regressions are running.
+- Removed per-sample replay closures/temporary rotation objects and reused camera intersection storage. Full 30-second playback is tested at irregular timestamps and rewind while preserving pose storage. Final validation passes: TypeScript, lint, 59 unit tests, production build, and all four real-browser checks.
 - Vertical-slice temporal presentation: staged opaque reset curtain and reveal fade, newest-echo cyan scan/opacity materialization, first-reveal messaging, and numbered timeline entries reflecting actual retained recordings. Presentation never delays recorded movement or shared occupancy; reduced motion removes scan/flicker/caption animation. Browser checks now verify reset freeze, reveal messaging, timeline labels, and sound volume. TypeScript, lint, 58 unit tests, production build, and all four browser tests pass.
 - Original Web Audio feedback for footsteps, landing, plate edges, gate changes, temporal reset, echo appearance, core completion, and a quiet facility hum. Audio starts only on a user gesture, pauses/mutes with simulation, caps transient voices at twelve, and disposes on route exit. Existing pause panel has a session-only volume slider. Validation: 56 unit tests, TypeScript, lint, production build, and all four real-browser checks pass.
 - Vertical-slice movement pass: 90ms coyote time, 120ms jump buffering, reset cleanup, smoothed camera aim, immediate wall retraction, and projection updates only when FOV changes. TypeScript, lint, and 51 unit tests pass.
@@ -32,7 +32,7 @@
 - Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working
-- Polish the first chamber's reset, actual echo reveal, sound feedback, and HUD. No additional levels or campaign mechanics in this pass.
+- First-chamber vertical-slice refinement delivered and verified. No additional levels or campaign mechanics were added. Next work should be playtesting/tuning this slice before increasing complexity.
 
 ## Remaining
 - Reusable switches, cube relay, security timing, and remaining campaign levels.
