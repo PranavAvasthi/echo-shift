@@ -17,6 +17,21 @@ describe("simulation clock", () => {
 });
 
 describe("arcade movement", () => {
+  it("expires jump forgiveness rather than allowing a jump long after a ledge", () => {
+    const player = new PlayerController();
+    player.grounded = true;
+    player.step(idle, 1 / 60);
+    player.grounded = false;
+    for (let i = 0; i < 12; i++) player.step(idle, 1 / 60);
+    expect(player.step({ ...idle, jump: true }, 1 / 60).y).toBeLessThan(0);
+  });
+  it("expires a buffered airborne press before a late landing", () => {
+    const player = new PlayerController();
+    player.step({ ...idle, jump: true }, 1 / 60);
+    for (let i = 0; i < 12; i++) player.step(idle, 1 / 60);
+    player.grounded = true;
+    expect(player.step(idle, 1 / 60).y).toBeLessThanOrEqual(0);
+  });
   it("forgives a late ledge jump but never grants a second airborne jump", () => {
     const player = new PlayerController();
     player.grounded = true;

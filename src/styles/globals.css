@@ -241,19 +241,24 @@ h1 span {
   gap: 14px;
 }
 .timeline-dot {
-  width: 7px;
-  height: 7px;
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  font: 9px "IBM Plex Mono", monospace;
   border: 1px solid var(--cyan);
   border-radius: 50%;
   opacity: 0.4;
 }
 .timeline-dot.current {
   background: var(--text);
+  color: #05070b;
   opacity: 1;
   box-shadow: 0 0 10px #62f3ff55;
 }
 .timeline-dot.recorded {
-  background: var(--cyan);
+  background: #38e8ff15;
+  color: var(--cyan);
 }
 .controls {
   font:
@@ -292,7 +297,15 @@ h1 span {
 .reset-effect h2 { font: 500 64px "IBM Plex Mono", monospace; letter-spacing: -.05em; margin: 16px; color: #b6f8ff; }
 .reset-effect p:last-child { font: 11px "IBM Plex Mono", monospace; color: #aebbc8; letter-spacing: .12em; }
 .reset-effect.still { animation: none; }
-@keyframes temporal-reset { 0% { opacity: 0; } 10% { opacity: 1; } 20% { transform: translateX(5px); filter: brightness(1.7); } 25% { transform: translateX(-5px); } 30% { transform: none; filter: none; } 90% { opacity: 1; } 100% { opacity: 0; } }
+/* Conceal world replacement at the end; reveal resumes on the next simulation frame. */
+@keyframes temporal-reset { 0% { opacity: 0; } 12% { opacity: 1; } 22% { filter: brightness(1.3); } 38% { filter: none; } 65%, 100% { opacity: 1; background-color: #05070b; } }
+.echo-reveal-caption { position: absolute; left: 50%; top: 23%; transform: translateX(-50%); text-align: center; color: #b6f8ff; font: 14px "IBM Plex Mono", monospace; letter-spacing: .13em; animation: echo-caption 4s ease both; }
+.echo-reveal-caption small { display: block; margin-top: 10px; color: #aebbc8; font-size: 11px; letter-spacing: .02em; }
+.echo-reveal-caption.still { animation: none; }
+.temporal-reveal-wash { position: absolute; inset: 0; background: #05070b; pointer-events: none; animation: temporal-unveil .45s ease-out both; }
+@keyframes temporal-unveil { from { opacity: 1; } to { opacity: 0; } }
+@keyframes echo-caption { 0% { opacity: 0; } 12%, 75% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .echo-reveal-caption { animation: none; } }
 .victory-screen { background: #05070bd9; }
 .victory-stats { display: flex; justify-content: space-between; gap: 24px; padding: 26px 0; border-block: 1px solid #38e8ff22; margin: 24px 0; }
 .victory-stats span { font: 26px "IBM Plex Mono", monospace; color: #b6f8ff; }

@@ -10,6 +10,7 @@ export function GameHUD({ runtime }: { runtime: GameRuntime }) {
   const archivedRuns = useGameStore((s) => s.archivedRuns);
   const phase = useGameStore((s) => s.phase);
   const debug = useGameStore((s) => s.debug);
+  const reduceMotion = useGameStore((s) => s.reduceMotion);
   const puzzle = useGameStore((s) => s.puzzle);
   const levelIndex = useGameStore((s) => s.levelIndex);
   const level = levels[levelIndex];
@@ -22,11 +23,13 @@ export function GameHUD({ runtime }: { runtime: GameRuntime }) {
         <div className="hud-right"><div className="hud-label accent">TEMPORAL SESSION ACTIVE</div><div className="hud-label"><span className="recording-light" />{phase === "playing" ? "RECORDING" : "STANDBY"}</div>{process.env.NODE_ENV === "development" && debug && <div className="hud-label" data-testid="frame-count">{frames} FRAMES / 25 Hz</div>}<div className="hud-label" data-testid="archive-count">{archivedRuns} RUNS CAPTURED</div></div>
       </div>
       <div className="crosshair" aria-hidden="true" />
+      {phase === "playing" && run > 1 && elapsed < .5 && <div className="temporal-reveal-wash" key={`wash-${run}`} aria-hidden="true" />}
+      {phase === "playing" && run > 1 && elapsed < 4 && <div className={`echo-reveal-caption${reduceMotion ? " still" : ""}`} key={run} role="status" data-testid="echo-reveal">YOUR PAST REMAINS.<small>That hologram is you. Every move was yours.</small></div>}
       {phase === "playing" && <div className="objective-strip"><span className="eyebrow">REACH THE CORE</span><p data-testid="tutorial-hint">{puzzle.hint}</p></div>}
       {phase === "playing" && puzzle.canActivate && <div className="interaction-prompt" data-testid="core-prompt">[E] STABILIZE</div>}
       <div className="hud-bottom">
         <div className="controls">W A S D / MOVE · MOUSE / LOOK<br />SPACE / JUMP · SHIFT / SPRINT<br />R / LEAVE ECHO · E / INTERACT · ESC / PAUSE</div>
-        <div className="hud-run" data-testid="run-number">RUN {String(run).padStart(2, "0")}<div className="timeline" aria-hidden="true">{Array.from({ length: Math.min(run, 7) }, (_, i) => <span key={i} className={`timeline-dot ${i === Math.min(run, 7) - 1 ? "current" : "recorded"}`} />)}</div></div>
+        <div className="hud-run" data-testid="run-number">RUN {String(run).padStart(2, "0")}<div className="timeline" aria-label="Active temporal sequence">{runtime.timeline.recordings.filter((recording) => recording.runId < run).map((recording) => <span key={recording.runId} className="timeline-dot recorded" aria-label={`Echo ${recording.runId}`}>{recording.runId}</span>)}<span className="timeline-dot current" aria-label={`Current run ${run}`}>{run}</span></div></div>
         <div className="hud-label hud-right">COOPERATE WITH YOUR PAST<br /><span data-testid="echo-count">{puzzle.echoCount} ACTIVE ECHOES</span></div>
       </div>
       {process.env.NODE_ENV === "development" && debug && <DebugPanel runtime={runtime} />}

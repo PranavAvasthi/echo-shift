@@ -1,6 +1,7 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Vertical-slice temporal presentation: staged opaque reset curtain and reveal fade, newest-echo cyan scan/opacity materialization, first-reveal messaging, and numbered timeline entries reflecting actual retained recordings. Presentation never delays recorded movement or shared occupancy; reduced motion removes scan/flicker/caption animation. Browser checks now verify reset freeze, reveal messaging, timeline labels, and sound volume. TypeScript, lint, 58 unit tests, production build, and all four browser tests pass.
 - Original Web Audio feedback for footsteps, landing, plate edges, gate changes, temporal reset, echo appearance, core completion, and a quiet facility hum. Audio starts only on a user gesture, pauses/mutes with simulation, caps transient voices at twelve, and disposes on route exit. Existing pause panel has a session-only volume slider. Validation: 56 unit tests, TypeScript, lint, production build, and all four real-browser checks pass.
 - Vertical-slice movement pass: 90ms coyote time, 120ms jump buffering, reset cleanup, smoothed camera aim, immediate wall retraction, and projection updates only when FOV changes. TypeScript, lint, and 51 unit tests pass.
 - Updated the play guide, replay architecture explanation, limitations, and screenshots from actual recorded-echo browser playthroughs. The two-chamber prototype is ready to play.

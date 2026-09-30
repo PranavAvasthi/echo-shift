@@ -46,8 +46,15 @@ test("solve both chambers using one, then two, actually recorded past selves", a
   await walkUntil(page, "KeyA", "x", -3.5, "below");
   await expect(page.getByTestId("plate-a")).toContainText("YOU");
   await page.keyboard.press("KeyR");
+  await expect(page.getByRole("status").filter({ hasText: "Echo 01 materializing" })).toBeVisible();
+  const frozenTimer = await page.getByTestId("timer").textContent();
+  await page.waitForTimeout(250);
+  expect(await page.getByTestId("timer").textContent()).toBe(frozenTimer);
   await expect(page.getByTestId("run-number")).toContainText("RUN 02");
   await expect(page.getByTestId("echo-1")).toHaveCount(1);
+  await expect(page.getByTestId("echo-reveal")).toContainText("That hologram is you");
+  await expect(page.getByLabel("Echo 1", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Current run 2", { exact: true })).toBeVisible();
 
   // Echo 1 repeats the exploratory path, then holds the last plate position.
   // Wait for its endpoint instead of scripting or teleporting it to the plate.
@@ -59,11 +66,16 @@ test("solve both chambers using one, then two, actually recorded past selves", a
   }, { timeout: 22_000 }).toBe(true);
   await expect(page.getByTestId("plate-a")).toContainText("ECHO 01");
   await expect(page.getByTestId("gate-state")).toHaveText("GATE OPEN");
+  await page.keyboard.press("Backquote");
   await page.screenshot({ path: "test-results/cooperation-echo.png" });
+  await page.keyboard.press("Backquote");
 
   // Pause freezes the player, the replay, and the timer together.
   await page.evaluate(() => document.exitPointerLock());
   await expect(page.getByRole("button", { name: "RESUME", exact: true })).toBeVisible();
+  await expect(page.getByLabel("Sound volume")).toHaveValue("0.65");
+  await page.getByLabel("Sound volume").fill("0.3");
+  await expect(page.getByLabel("Sound volume")).toHaveValue("0.3");
   const timer = await page.getByTestId("timer").textContent();
   await page.waitForTimeout(400);
   expect(await page.getByTestId("timer").textContent()).toBe(timer);
