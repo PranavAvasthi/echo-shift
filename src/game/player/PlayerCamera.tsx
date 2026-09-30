@@ -6,7 +6,7 @@ import { useGameStore } from "@/game/state/gameStore";
 
 export function PlayerCamera({ runtime }: { runtime: GameRuntime }) {
   const { camera, scene, gl } = useThree();
-  const scratch = useMemo(() => ({ target: new Vector3(), ideal: new Vector3(), direction: new Vector3(), ray: new Raycaster() }), []);
+  const scratch = useMemo(() => ({ target: new Vector3(), follow: new Vector3(), ideal: new Vector3(), direction: new Vector3(), ray: new Raycaster() }), []);
   const obstacles = useRef<Mesh[]>([]);
   const snap = useRef(true);
   const resetVersion = useGameStore((s) => s.resetVersion);
@@ -19,8 +19,10 @@ export function PlayerCamera({ runtime }: { runtime: GameRuntime }) {
 
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
-    const { target, ideal, direction, ray } = scratch;
+    const { target, follow, ideal, direction, ray } = scratch;
     target.set(runtime.position.x, runtime.position.y + .5, runtime.position.z);
+    if (snap.current) follow.copy(target);
+    else follow.lerp(target, 1 - Math.exp(-22 * delta));
     const distance = 4.5;
     ideal.set(
       target.x + Math.sin(runtime.yaw) * Math.cos(runtime.pitch) * distance,
@@ -34,13 +36,14 @@ export function PlayerCamera({ runtime }: { runtime: GameRuntime }) {
     ray.far = rayLength;
     const hits = ray.intersectObjects(obstacles.current, false);
     if (hits.length) ideal.copy(target).addScaledVector(ray.ray.direction, Math.max(.4, hits[0].distance - .18));
-    if (snap.current) { camera.position.copy(ideal); snap.current = false; }
+    // Retract immediately at a wall; damping inward would briefly clip through it.
+    if (snap.current || (hits.length && camera.position.distanceTo(target) > ideal.distanceTo(target))) { camera.position.copy(ideal); snap.current = false; }
     else camera.position.lerp(ideal, 1 - Math.exp(-12 * delta));
-    camera.lookAt(target);
+    camera.lookAt(follow);
     if (camera instanceof PerspectiveCamera) {
       const sprint = runtime.animation === "run" && !useGameStore.getState().reduceMotion;
-      camera.fov = MathUtils.damp(camera.fov, sprint ? 62 : 58, 8, delta);
-      camera.updateProjectionMatrix();
+      const fov = MathUtils.damp(camera.fov, sprint ? 62 : 58, 8, delta);
+      if (Math.abs(fov - camera.fov) > .001) { camera.fov = fov; camera.updateProjectionMatrix(); }
     }
     runtime.frameTime = rawDelta * 1000;
     runtime.drawCalls = gl.info.render.calls;

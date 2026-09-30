@@ -17,6 +17,26 @@ describe("simulation clock", () => {
 });
 
 describe("arcade movement", () => {
+  it("forgives a late ledge jump but never grants a second airborne jump", () => {
+    const player = new PlayerController();
+    player.grounded = true;
+    player.step(idle, 1 / 60);
+    player.grounded = false;
+    player.step({ ...idle, jump: true }, 1 / 60);
+    expect(player.velocity.y).toBeGreaterThan(7);
+    const velocity = player.velocity.y;
+    player.step({ ...idle, jump: true }, 1 / 60);
+    expect(player.velocity.y).toBeLessThan(velocity);
+  });
+  it("buffers a jump shortly before landing and clears it on reset", () => {
+    const player = new PlayerController();
+    player.step({ ...idle, jump: true }, 1 / 60);
+    player.grounded = true;
+    expect(player.step(idle, 1 / 60).y).toBeGreaterThan(0);
+    player.reset();
+    player.grounded = true;
+    expect(player.step(idle, 1 / 60).y).toBeLessThanOrEqual(0);
+  });
   it("normalizes diagonal movement and rotates movement with camera yaw", () => {
     const straight = new PlayerController();
     const diagonal = new PlayerController();

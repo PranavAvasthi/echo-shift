@@ -1,6 +1,7 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Vertical-slice movement pass: 90ms coyote time, 120ms jump buffering, reset cleanup, smoothed camera aim, immediate wall retraction, and projection updates only when FOV changes. TypeScript, lint, and 51 unit tests pass.
 - Updated the play guide, replay architecture explanation, limitations, and screenshots from actual recorded-echo browser playthroughs. The two-chamber prototype is ready to play.
 - Gameplay HUD focuses on puzzle state; technical frame counts appear only with the development debug panel. Lowered the gate label to avoid covering the timer. TypeScript, lint, and a fresh real-browser two-chamber playthrough pass.
 - Dual Core is playable after the first chamber: two distant plates, a 40-second run limit, two real echoes working simultaneously, chamber progression, session totals, final prototype completion, and a full timeline restart.
@@ -28,7 +29,7 @@
 - Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working
-- Two-chamber prototype delivered. Next planned campaign work: deterministic cube relay and timed security mechanics.
+- Polish the first chamber's reset, actual echo reveal, sound feedback, and HUD. No additional levels or campaign mechanics in this pass.
 
 ## Remaining
 - Reusable switches, cube relay, security timing, and remaining campaign levels.
