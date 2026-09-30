@@ -5,9 +5,13 @@
 - Selected React 19 / React Three Fiber 9 / Rapier 2 compatible foundation.
 - Initialized Next.js App Router, strict TypeScript, lint tooling, and session-aware landing screen.
 - Foundation validation: TypeScript, ESLint, and production build pass.
+- Phase 1 complete: fixed-step Rapier character controller, camera-relative WASD, sprint, grounded jumping, acceleration/deceleration, room/platform collision, collision-aware third-person camera.
+- Added input cleanup on pause/focus loss, pointer lock, mobile notice, WebGL failure handling, minimal HUD, and session-only settings.
+- Seven foundation tests pass. Real desktop Chromium verified jump/landing, movement, wall collision, pause freeze, and manual reset; mobile notice verified separately.
+- First browser pass exposed a zero-height scene wrapper and a pointer-lock cursor warp; both were fixed and regression-verified.
 
 ## Currently working
-- Phase 1: Next.js, strict TypeScript, fixed-step physics, collision room, third-person controller.
+- Phase 2: timestamped replay structures, fixed-rate recorder, recording validation.
 
 ## Remaining
 - Phase 2: timestamped, fixed-rate replay recording and automated validation.
@@ -26,5 +30,7 @@
 - Next.js App Router provides `/` and `/game`; gameplay is client-only and lazy loaded.
 
 ## Known issues / verification
-- Gameplay has not yet been wired to a rendered scene or browser-verified.
+- Current chamber is a movement test, not yet the cooperative puzzle. Doorway is open; floor marker and prism are non-interactive.
+- Chromium browser tests require a focused desktop window on macOS; headless pointer lock was rejected. Tests use native graphics.
+- R3F currently emits a single upstream Three.js Clock deprecation notice; Rapier emits a single WASM initialization deprecation notice. No application runtime errors observed.
 - This initial delivery targets Phases 1 and 2, not the full game described in the roadmap.
