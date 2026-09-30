@@ -47,6 +47,14 @@ describe("arcade movement", () => {
     player.reset();
     expect(player.velocity).toEqual({ x: 0, y: 0, z: 0 });
   });
+  it("clears the 1.1m training platform despite discrete gravity integration", () => {
+    const player = new PlayerController();
+    player.grounded = true;
+    let height = player.step({ ...idle, jump: true }, 1 / 60).y;
+    while (player.velocity.y > 0) height += player.step(idle, 1 / 60).y;
+    expect(height).toBeGreaterThan(1.1);
+    expect(height).toBeLessThan(1.5);
+  });
 });
 
 describe("phase machine", () => {

@@ -11,7 +11,8 @@
 - First browser pass exposed a zero-height scene wrapper and a pointer-lock cursor warp; both were fixed and regression-verified.
 - Phase 2 recorder module complete: 25 Hz timestamp grid, bracketing physics resampling, quaternion slerp, velocity/animation capture, precise partial endpoints, independent action timestamps, bounded duration, idempotent finish.
 - Phase 2 complete: actual collision-resolved player transforms are sampled after physics, partial/timeout runs are captured once, and a six-run archive remains in memory until restart/refresh.
-- All checks pass: strict TypeScript, ESLint, 26 unit tests, production build, and three Chromium integration tests.
+- All checks pass: strict TypeScript, ESLint, 27 unit tests, production build, and three Chromium integration tests.
+- Final movement review found that discrete gravity reduced jump clearance below the 1.1m training platform. Raised the impulse slightly and verified an actual platform jump/landing in Chromium, with a clearance regression test.
 - Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working

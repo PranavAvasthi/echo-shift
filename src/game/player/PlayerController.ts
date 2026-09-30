@@ -25,7 +25,7 @@ export class PlayerController {
     this.velocity.z += (targetZ - this.velocity.z) * response;
     if (length) this.heading = Math.atan2(-targetX, -targetZ);
     if (input.jump && this.grounded) {
-      this.velocity.y = 7;
+      this.velocity.y = 7.5;
       this.grounded = false;
     }
     this.velocity.y = this.grounded ? -0.5 : Math.max(-24, this.velocity.y - 22 * dt);
