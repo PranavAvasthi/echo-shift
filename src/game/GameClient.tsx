@@ -6,6 +6,7 @@ import { GameRuntime } from "./core/GameRuntime";
 import { usePlayerInput } from "./player/usePlayerInput";
 import { useGameStore } from "./state/gameStore";
 import { levels } from "./levels";
+import { RESET_DURATION_MS } from "./core/temporalPresentation";
 import { GameHUD } from "@/components/hud/GameHUD";
 import { DesktopRequired, GameOverlays, LoadingScreen, RendererError } from "@/components/overlays/GameOverlays";
 import { RendererBoundary } from "@/components/ui/RendererBoundary";
@@ -17,7 +18,10 @@ export default function GameClient() {
   const [rendererStatus, setRendererStatus] = useState<"checking" | "ready" | "offline" | "mobile">("checking");
   const [pointerError, setPointerError] = useState("");
   const phase = useGameStore((s) => s.phase);
+  const volume = useGameStore((s) => s.volume);
   usePlayerInput(runtime);
+  useEffect(() => () => runtime.audio.dispose(), [runtime]);
+  useEffect(() => runtime.audio.setMix(volume, ["playing", "runResetting", "levelComplete", "gameComplete"].includes(phase)), [runtime, volume, phase]);
 
   useEffect(() => {
     let active = true;
@@ -45,15 +49,18 @@ export default function GameClient() {
       if (document.pointerLockElement) document.exitPointerLock();
     }
     if (phase === "levelComplete" && useGameStore.getState().levelIndex === levels.length - 1) useGameStore.getState().transition("gameComplete");
+    if (phase === "levelComplete") runtime.audio.play("complete");
     if (phase !== "runResetting") return;
     runtime.clearInput();
+    runtime.audio.play("reset");
     runtime.capture(useGameStore.getState().resetReason);
     useGameStore.getState().captured(runtime.timeline.count, runtime.timeline.summary(), runtime.sessionLoops);
-    const timer = window.setTimeout(() => useGameStore.getState().finishReset(Boolean(document.pointerLockElement) && !document.hidden), 1200);
+    const timer = window.setTimeout(() => useGameStore.getState().finishReset(Boolean(document.pointerLockElement) && !document.hidden), RESET_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [phase, runtime]);
 
   const resume = useCallback(() => {
+    runtime.audio.unlock();
     const canvas = document.querySelector<HTMLCanvasElement>(".game-shell canvas");
     if (!canvas?.requestPointerLock) { setPointerError("Mouse capture is unavailable. Open the game directly in a desktop browser."); return; }
     const begin = () => { setPointerError(""); useGameStore.getState().transition("playing"); };
@@ -63,7 +70,7 @@ export default function GameClient() {
       if (request) request.then(begin).catch((error: unknown) => setPointerError(`Mouse capture was declined. Click the button again to continue.${process.env.NODE_ENV === "development" && error instanceof Error ? ` (${error.message})` : ""}`));
       else begin();
     } catch { setPointerError("Mouse capture was declined. Click the button again to continue."); }
-  }, []);
+  }, [runtime]);
 
   return (
     <main className="game-shell">

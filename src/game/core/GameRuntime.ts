@@ -9,9 +9,11 @@ import type { PlayerPose, RunEndReason } from "@/game/replay/replay.types";
 import { PuzzleWorld } from "@/game/entities/PuzzleWorld";
 import type { InteractionActor } from "@/game/entities/interaction.types";
 import { levels } from "@/game/levels";
+import { AudioManager } from "@/game/audio/AudioManager";
 
 /** Owned by a mounted game, never persisted. Frame-level data bypasses React. */
 export class GameRuntime {
+  readonly audio = new AudioManager();
   readonly clock = new GameClock();
   readonly controller = new PlayerController();
   recorder = new ReplayRecorder();

@@ -1,6 +1,7 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Original Web Audio feedback for footsteps, landing, plate edges, gate changes, temporal reset, echo appearance, core completion, and a quiet facility hum. Audio starts only on a user gesture, pauses/mutes with simulation, caps transient voices at twelve, and disposes on route exit. Existing pause panel has a session-only volume slider. Validation: 56 unit tests, TypeScript, lint, production build, and all four real-browser checks pass.
 - Vertical-slice movement pass: 90ms coyote time, 120ms jump buffering, reset cleanup, smoothed camera aim, immediate wall retraction, and projection updates only when FOV changes. TypeScript, lint, and 51 unit tests pass.
 - Updated the play guide, replay architecture explanation, limitations, and screenshots from actual recorded-echo browser playthroughs. The two-chamber prototype is ready to play.
 - Gameplay HUD focuses on puzzle state; technical frame counts appear only with the development debug panel. Lowered the gate label to avoid covering the timer. TypeScript, lint, and a fresh real-browser two-chamber playthrough pass.

@@ -36,6 +36,7 @@ interface GameState {
   invertY: boolean;
   reduceMotion: boolean;
   debug: boolean;
+  volume: number;
   transition: (phase: GamePhase) => void;
   openSession: () => void;
   pause: () => void;
@@ -45,14 +46,14 @@ interface GameState {
   advanceLevel: () => void;
   telemetry: (elapsed: number, recordedFrames: number, puzzle?: PuzzleSnapshot, sessionElapsed?: number) => void;
   captured: (archivedRuns: number, latestRecording: RecordingSummary | null, totalLoops?: number) => void;
-  configure: (settings: Partial<Pick<GameState, "sensitivity" | "invertY" | "reduceMotion" | "debug">>) => void;
+  configure: (settings: Partial<Pick<GameState, "sensitivity" | "invertY" | "reduceMotion" | "debug" | "volume">>) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
   phase: "loading", run: 1, levelIndex: 0, totalLoops: 0, resetVersion: 0, elapsed: 0, recordedFrames: 0,
   archivedRuns: 0, latestRecording: null, resetReason: "manual",
   puzzle: EMPTY_PUZZLE, sessionElapsed: 0,
-  sensitivity: 1, invertY: false, reduceMotion: false, debug: false,
+  sensitivity: 1, invertY: false, reduceMotion: false, debug: false, volume: .65,
   transition: (phase) => {
     if (transitions[get().phase].includes(phase)) set({ phase });
   },
