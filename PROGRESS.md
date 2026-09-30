@@ -1,6 +1,7 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Shared deterministic puzzle model and stable-ID tutorial definition: both current player and actual recorded echoes can occupy plates, the door requires live occupancy, and only the current player can activate the core. Six new interaction/reset/cooperation tests pass.
 - Phase 3: actual recorded echo playback, timestamp position interpolation and quaternion slerp, end-pose holding, action crossing/rewind handling, multiple independent replays, shared player/echo character model.
 - Playback validation: 37 total unit tests and the movement/echo browser regression pass; TypeScript, ESLint and production build pass.
 - Inspected repository: empty Git repository, no existing application or instructions.
