@@ -10,19 +10,22 @@ export function GameHUD({ runtime }: { runtime: GameRuntime }) {
   const archivedRuns = useGameStore((s) => s.archivedRuns);
   const phase = useGameStore((s) => s.phase);
   const debug = useGameStore((s) => s.debug);
+  const puzzle = useGameStore((s) => s.puzzle);
   const remaining = Math.max(0, Math.ceil(RUN_DURATION - elapsed));
   return (
     <div className="hud" aria-label="Game status">
       <div className="hud-top">
-        <div><div className="hud-logo">ECHO<span>{"//"}</span>SHIFT</div><div className="hud-label">LAB 00 / CONTROLLER CALIBRATION<br />TEMPORAL RESEARCH DIVISION</div></div>
+        <div><div className="hud-logo">ECHO<span>{"//"}</span>SHIFT</div><div className="hud-label">LAB 00 / YOUR PAST REMAINS<br />TEMPORAL RESEARCH DIVISION</div><div className={`gate-status ${puzzle.doorOpen ? "active" : ""}`} data-testid="gate-state">GATE {puzzle.doorOpen ? "OPEN" : "LOCKED"}</div>{puzzle.plates.map((plate) => <div key={plate.id} className="hud-label" data-testid={`plate-${plate.label.toLowerCase()}`}>PLATE {plate.label} / {plate.active ? plate.occupants.join(" + ") : "EMPTY"}</div>)}</div>
         <div><div className="hud-time" data-testid="timer">00:{String(remaining).padStart(2, "0")}</div><div className="hud-label">RUN TIME REMAINING</div></div>
         <div className="hud-right"><div className="hud-label accent">TEMPORAL SESSION ACTIVE</div><div className="hud-label"><span className="recording-light" />{phase === "playing" ? "RECORDING" : "STANDBY"}</div><div className="hud-label" data-testid="frame-count">{frames} FRAMES / 25 Hz</div><div className="hud-label" data-testid="archive-count">{archivedRuns} RUNS CAPTURED</div></div>
       </div>
       <div className="crosshair" aria-hidden="true" />
+      {phase === "playing" && <div className="objective-strip"><span className="eyebrow">REACH THE CORE</span><p data-testid="tutorial-hint">{puzzle.hint}</p></div>}
+      {phase === "playing" && puzzle.canActivate && <div className="interaction-prompt" data-testid="core-prompt">[E] STABILIZE</div>}
       <div className="hud-bottom">
-        <div className="controls">W A S D / MOVE · MOUSE / LOOK<br />SPACE / JUMP · SHIFT / SPRINT<br />R / END RUN · ESC / PAUSE</div>
+        <div className="controls">W A S D / MOVE · MOUSE / LOOK<br />SPACE / JUMP · SHIFT / SPRINT<br />R / LEAVE ECHO · E / INTERACT · ESC / PAUSE</div>
         <div className="hud-run" data-testid="run-number">RUN {String(run).padStart(2, "0")}<div className="timeline" aria-hidden="true">{Array.from({ length: Math.min(run, 7) }, (_, i) => <span key={i} className={`timeline-dot ${i === Math.min(run, 7) - 1 ? "current" : "recorded"}`} />)}</div></div>
-        <div className="hud-label hud-right">YOUR PAST REMAINS<br />{Math.max(0, Math.min(run - 1, 6))} ACTIVE ECHOES</div>
+        <div className="hud-label hud-right">COOPERATE WITH YOUR PAST<br /><span data-testid="echo-count">{puzzle.echoCount} ACTIVE ECHOES</span></div>
       </div>
       {process.env.NODE_ENV === "development" && debug && <DebugPanel runtime={runtime} />}
     </div>

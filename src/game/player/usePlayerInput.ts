@@ -18,6 +18,7 @@ export function usePlayerInput(runtime: GameRuntime) {
       if (event.code === "Escape") { state.pause(); return; }
       if (event.code === "KeyR" && !event.repeat) { state.requestReset(); return; }
       if (event.code === "Space" && !event.repeat) runtime.jumpQueued = true;
+      if (event.code === "KeyE" && !event.repeat) runtime.interactQueued = true;
       runtime.keys.add(event.code);
     };
     const up = (event: KeyboardEvent) => runtime.keys.delete(event.code);

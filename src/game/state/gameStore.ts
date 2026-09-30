@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { RUN_DURATION } from "@/game/core/constants";
 import type { RecordingSummary } from "@/game/replay/RunTimeline";
 import type { RunEndReason } from "@/game/replay/replay.types";
+import { EMPTY_PUZZLE, type PuzzleSnapshot } from "@/game/entities/interaction.types";
 
 export type GamePhase = "landing" | "loading" | "intro" | "playing" | "runFailed" | "runResetting" | "levelComplete" | "gameComplete" | "paused";
 
@@ -26,6 +27,8 @@ interface GameState {
   archivedRuns: number;
   latestRecording: RecordingSummary | null;
   resetReason: RunEndReason;
+  puzzle: PuzzleSnapshot;
+  sessionElapsed: number;
   sensitivity: number;
   invertY: boolean;
   reduceMotion: boolean;
@@ -36,7 +39,7 @@ interface GameState {
   requestReset: (reason?: RunEndReason) => void;
   finishReset: (resume: boolean) => void;
   restartTimeline: () => void;
-  telemetry: (elapsed: number, recordedFrames: number) => void;
+  telemetry: (elapsed: number, recordedFrames: number, puzzle?: PuzzleSnapshot, sessionElapsed?: number) => void;
   captured: (archivedRuns: number, latestRecording: RecordingSummary | null) => void;
   configure: (settings: Partial<Pick<GameState, "sensitivity" | "invertY" | "reduceMotion" | "debug">>) => void;
 }
@@ -44,21 +47,22 @@ interface GameState {
 export const useGameStore = create<GameState>((set, get) => ({
   phase: "loading", run: 1, resetVersion: 0, elapsed: 0, recordedFrames: 0,
   archivedRuns: 0, latestRecording: null, resetReason: "manual",
+  puzzle: EMPTY_PUZZLE, sessionElapsed: 0,
   sensitivity: 1, invertY: false, reduceMotion: false, debug: false,
   transition: (phase) => {
     if (transitions[get().phase].includes(phase)) set({ phase });
   },
-  openSession: () => set({ phase: "loading", run: 1, resetVersion: 0, elapsed: 0, recordedFrames: 0, archivedRuns: 0, latestRecording: null, resetReason: "manual" }),
+  openSession: () => set({ phase: "loading", run: 1, resetVersion: 0, elapsed: 0, recordedFrames: 0, archivedRuns: 0, latestRecording: null, resetReason: "manual", puzzle: EMPTY_PUZZLE, sessionElapsed: 0 }),
   pause: () => { if (get().phase === "playing") set({ phase: "paused" }); },
   requestReset: (resetReason = "manual") => {
     if (["playing", "paused", "runFailed"].includes(get().phase)) set({ phase: "runResetting", resetReason });
   },
   finishReset: (resume) => {
     if (get().phase !== "runResetting") return;
-    set((state) => ({ phase: resume ? "playing" : "paused", run: state.run + 1, resetVersion: state.resetVersion + 1, elapsed: 0, recordedFrames: 0 }));
+    set((state) => ({ phase: resume ? "playing" : "paused", run: state.run + 1, resetVersion: state.resetVersion + 1, elapsed: 0, recordedFrames: 0, puzzle: EMPTY_PUZZLE }));
   },
-  restartTimeline: () => set((state) => ({ phase: "intro", run: 1, resetVersion: state.resetVersion + 1, elapsed: 0, recordedFrames: 0, archivedRuns: 0, latestRecording: null, resetReason: "manual" })),
-  telemetry: (elapsed, recordedFrames) => set({ elapsed: Math.min(elapsed, RUN_DURATION), recordedFrames }),
+  restartTimeline: () => set((state) => ({ phase: "intro", run: 1, resetVersion: state.resetVersion + 1, elapsed: 0, recordedFrames: 0, archivedRuns: 0, latestRecording: null, resetReason: "manual", puzzle: EMPTY_PUZZLE, sessionElapsed: 0 })),
+  telemetry: (elapsed, recordedFrames, puzzle = get().puzzle, sessionElapsed = get().sessionElapsed) => set({ elapsed: Math.min(elapsed, RUN_DURATION), recordedFrames, puzzle, sessionElapsed }),
   captured: (archivedRuns, latestRecording) => set({ archivedRuns, latestRecording }),
   configure: (settings) => set(settings),
 }));

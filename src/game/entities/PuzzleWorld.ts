@@ -21,7 +21,7 @@ export class PuzzleWorld {
         // Shared deterministic volumes use collision-resolved transforms for
         // players and sampled transforms for echoes. Jumping above a plate
         // does not count; echoes need no physics bodies and never block anyone.
-        if (Math.abs(p.x - plate.position.x) <= 1.02 && Math.abs(p.z - plate.position.z) <= 1.02 && p.y >= .55 && p.y <= 1.08) occupied.push(actor.source);
+        if (Math.abs(p.x - plate.position.x) <= 1.02 && Math.abs(p.z - plate.position.z) <= 1.02 && p.y >= .55 && p.y <= .99) occupied.push(actor.source);
       }
       if (occupied.some((source) => source.type === "player")) this.discoveredPlate = true;
     }

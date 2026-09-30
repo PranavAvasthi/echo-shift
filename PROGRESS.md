@@ -1,6 +1,9 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- First cooperative chamber is playable end-to-end: physical gate, glowing shared plate, E-activated core, evolving tutorial hints, actual recorded echoes, reset effect, and victory/replay screen.
+- Verified in Chromium without teleporting or scripting echoes: discover plate → leave it → collide with shut gate → record a partial run ending on plate → past self replays and holds → current self crosses → core activation → victory → clean restart.
+- Full milestone validation: TypeScript, lint, 44 unit tests, production build, all four browser tests pass.
 - Shared deterministic puzzle model and stable-ID tutorial definition: both current player and actual recorded echoes can occupy plates, the door requires live occupancy, and only the current player can activate the core. Six new interaction/reset/cooperation tests pass.
 - Phase 3: actual recorded echo playback, timestamp position interpolation and quaternion slerp, end-pose holding, action crossing/rewind handling, multiple independent replays, shared player/echo character model.
 - Playback validation: 37 total unit tests and the movement/echo browser regression pass; TypeScript, ESLint and production build pass.
@@ -20,12 +23,10 @@
 - Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working
-- Building the first actual cooperative puzzle: shared pressure plate, physical door, reachable objective, tutorial hints, and a completion reward.
+- First cooperative prototype verified. Preparing a second challenge that requires two recorded selves simultaneously.
 
 ## Remaining
-- Phase 4: shared pressure plate, door, switch interaction model.
-- Phase 5: temporal run resets and echo creation.
-- Prove the one-room cooperative puzzle before building any remaining levels.
+- Reusable switches, cube relay, security timing, and remaining campaign levels.
 - Phases 6–11: tutorial, five levels, visual polish, original audio, full UX, profiling.
 
 ## Architecture decisions
@@ -40,7 +41,7 @@
 - Next.js App Router provides `/` and `/game`; gameplay is client-only and lazy loaded.
 
 ## Known issues / verification
-- Current chamber is a movement test, not yet the cooperative puzzle. Doorway is open; floor marker and prism are non-interactive.
+- Environment remains a deliberately small grey-box prototype; final facility art, spatial audio, campaign, and profiling remain unfinished.
 - Browser tests use full headless Chromium (`channel: chromium`). The smaller headless-shell rejected native pointer lock; full Chromium now verifies it without capturing the desktop mouse.
 - R3F currently emits a single upstream Three.js Clock deprecation notice; Rapier emits a single WASM initialization deprecation notice. No application runtime errors observed.
-- This initial delivery targets Phases 1 and 2, not the full game described in the roadmap.
+- The first puzzle is complete; the full five-level campaign is still in development.

@@ -50,16 +50,28 @@ export function Player({ runtime }: { runtime: GameRuntime }) {
     const speed = Math.hypot(runtime.controller.velocity.x, runtime.controller.velocity.z);
     runtime.animation = !runtime.controller.grounded ? "jump" : speed > 4.5 ? "run" : speed > .15 ? "walk" : "idle";
     runtime.clock.step(PHYSICS_STEP);
+    runtime.sessionElapsed += PHYSICS_STEP;
   });
 
   useAfterPhysicsStep(() => {
     if (!body.current || useGameStore.getState().phase !== "playing") return;
     Object.assign(runtime.position, body.current.translation());
     const elapsed = runtime.clock.elapsed;
-    for (const echo of runtime.echoes) echo.sample(elapsed);
+    runtime.updateWorld(elapsed);
+    const activating = runtime.interactQueued && runtime.world.canActivate;
+    runtime.interactQueued = false;
+    if (activating) runtime.animation = "interact";
     runtime.recorder.observe(elapsed, runtime.pose());
+    if (activating && runtime.activateCore()) {
+      const state = useGameStore.getState();
+      state.telemetry(elapsed, runtime.recorder.frameCount, runtime.world.snapshot(runtime.echoes.length), runtime.sessionElapsed);
+      runtime.capture("levelComplete");
+      state.captured(runtime.timeline.count, runtime.timeline.summary());
+      state.transition("levelComplete");
+      return;
+    }
     if (elapsed >= publishAt.current) {
-      useGameStore.getState().telemetry(elapsed, runtime.recorder.frameCount);
+      useGameStore.getState().telemetry(elapsed, runtime.recorder.frameCount, runtime.world.snapshot(runtime.echoes.length), runtime.sessionElapsed);
       publishAt.current = elapsed + 0.1;
     }
     if (elapsed >= RUN_DURATION) useGameStore.getState().requestReset("timeout");

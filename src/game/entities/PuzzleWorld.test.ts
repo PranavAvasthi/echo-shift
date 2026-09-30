@@ -70,4 +70,14 @@ describe("shared temporal puzzle", () => {
     expect(world.doorOpen).toBe(true);
     expect(world.canActivate).toBe(true);
   });
+  it("rejects completion at the run deadline before recording an out-of-range event", () => {
+    const runtime = new GameRuntime();
+    runtime.position.z = -11;
+    runtime.clock.step(30.016);
+    runtime.recorder.observe(runtime.clock.elapsed, runtime.pose());
+    runtime.world.update([player(0, -11), echo()]);
+    expect(runtime.world.canActivate).toBe(true);
+    expect(runtime.activateCore()).toBe(false);
+    expect(runtime.recorder.finish("timeout").actions).toHaveLength(0);
+  });
 });

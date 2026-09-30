@@ -32,7 +32,7 @@ export default function GameScene({ runtime, onContextLost }: { runtime: GameRun
       <fog attach="fog" args={["#10151d", 24, 55]} />
       <Suspense fallback={null}>
         <Physics timeStep={PHYSICS_STEP} paused={phase !== "playing"} gravity={[0, -22, 0]}>
-          <Facility />
+          <Facility runtime={runtime} />
           <Player runtime={runtime} />
           <Ready />
         </Physics>

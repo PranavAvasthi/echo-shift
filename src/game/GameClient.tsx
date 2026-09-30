@@ -39,7 +39,7 @@ export default function GameClient() {
   }, []);
 
   useEffect(() => {
-    if (phase === "paused" || phase === "intro") {
+    if (phase === "paused" || phase === "intro" || phase === "levelComplete") {
       runtime.clearInput();
       if (document.pointerLockElement) document.exitPointerLock();
     }
