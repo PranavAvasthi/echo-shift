@@ -37,6 +37,7 @@ function PauseMenu({ resume, pointerError }: { resume: () => void; pointerError:
   const sensitivity = useGameStore((s) => s.sensitivity);
   const invertY = useGameStore((s) => s.invertY);
   const reduceMotion = useGameStore((s) => s.reduceMotion);
+  const latestRecording = useGameStore((s) => s.latestRecording);
   const configure = useGameStore((s) => s.configure);
   const [confirmRestart, setConfirmRestart] = useState(false);
   return (
@@ -47,6 +48,7 @@ function PauseMenu({ resume, pointerError }: { resume: () => void; pointerError:
       <label className="setting">MOUSE SENSITIVITY <input aria-label="Mouse sensitivity" type="range" min="0.2" max="2.5" step="0.1" value={sensitivity} onChange={(e) => configure({ sensitivity: Number(e.target.value) })} /></label>
       <label className="setting">INVERT Y <input type="checkbox" checked={invertY} onChange={(e) => configure({ invertY: e.target.checked })} /></label>
       <label className="setting">REDUCE CAMERA MOTION <input type="checkbox" checked={reduceMotion} onChange={(e) => configure({ reduceMotion: e.target.checked })} /></label>
+      {latestRecording && <p data-testid="recording-summary">RUN {latestRecording.runId} CAPTURED / {latestRecording.duration.toFixed(2)}s / {latestRecording.frameCount} FRAMES / {latestRecording.endReason.toUpperCase()}</p>}
       <div className="button-row"><button className="secondary-button" onClick={() => useGameStore.getState().requestReset()}>END CURRENT RUN</button><button className="secondary-button" onClick={() => setConfirmRestart(true)}>RESTART TIMELINE</button></div>
       {confirmRestart && <div role="alert"><p>Collapse this timeline? All recorded runs will be lost.</p><div className="button-row"><button className="secondary-button" onClick={() => { useGameStore.getState().restartTimeline(); setConfirmRestart(false); }}>COLLAPSE + RESTART</button><button className="secondary-button" onClick={() => setConfirmRestart(false)}>CANCEL</button></div></div>}
       <p className="build-note">MOVEMENT + RECORDING BUILD<br />ECHO PLAYBACK AND PUZZLES ARE THE NEXT MILESTONE.</p>

@@ -2,11 +2,16 @@ import { GameClock } from "./GameClock";
 import { SPAWN } from "./constants";
 import { PlayerController } from "@/game/player/PlayerController";
 import type { PlayerAnimation } from "@/game/player/player.types";
+import { ReplayRecorder } from "@/game/replay/ReplayRecorder";
+import { RunTimeline } from "@/game/replay/RunTimeline";
+import type { PlayerPose, RunEndReason } from "@/game/replay/replay.types";
 
 /** Owned by a mounted game, never persisted. Frame-level data bypasses React. */
 export class GameRuntime {
   readonly clock = new GameClock();
   readonly controller = new PlayerController();
+  readonly recorder = new ReplayRecorder();
+  readonly timeline = new RunTimeline();
   readonly position = { ...SPAWN };
   readonly keys = new Set<string>();
   yaw = 0;
@@ -17,12 +22,28 @@ export class GameRuntime {
   drawCalls = 0;
   triangles = 0;
 
+  constructor() { this.recorder.start(1, "lab00-calibration", this.pose()); }
+
+  pose(): PlayerPose {
+    const halfHeading = this.controller.heading * .5;
+    return {
+      position: this.position,
+      rotation: { x: 0, y: Math.sin(halfHeading), z: 0, w: Math.cos(halfHeading) },
+      velocity: this.controller.velocity,
+      animation: this.animation,
+    };
+  }
+
+  capture(endReason: RunEndReason) { this.timeline.append(this.recorder.finish(endReason)); }
+
   clearInput() { this.keys.clear(); this.jumpQueued = false; }
-  reset() {
+  reset(runId = 1) {
     this.clock.reset();
     this.controller.reset();
     Object.assign(this.position, SPAWN);
     this.clearInput();
     this.animation = "idle";
+    if (runId === 1) this.timeline.clear();
+    this.recorder.start(runId, "lab00-calibration", this.pose());
   }
 }

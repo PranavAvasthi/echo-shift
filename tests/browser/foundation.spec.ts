@@ -10,12 +10,15 @@ async function position(page: Page) {
 test("actual WebGL room: movement, jumping, collision, pause and manual reset", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/game");
+  await page.goto("/");
+  await page.bringToFront();
+  await page.getByRole("link", { name: "ENTER THE LOOP" }).click();
   await expect(page.getByRole("button", { name: "BEGIN CALIBRATION" })).toBeVisible();
   await page.keyboard.press("Backquote");
   await page.getByRole("button", { name: "BEGIN CALIBRATION" }).click();
   await expect(page.getByRole("button", { name: "BEGIN CALIBRATION" })).not.toBeVisible();
   await expect(page.getByTestId("debug-panel")).toContainText("GROUNDED true");
+  await expect.poll(async () => Number((await page.getByTestId("frame-count").textContent())?.split(" ")[0])).toBeGreaterThan(1);
   const initial = await position(page);
   expect(initial.y).toBeGreaterThan(.7);
   expect(initial.y).toBeLessThan(.9);
@@ -45,9 +48,41 @@ test("actual WebGL room: movement, jumping, collision, pause and manual reset", 
   await page.getByRole("button", { name: "RESUME", exact: true }).click();
   await page.keyboard.press("KeyR");
   await expect(page.getByTestId("run-number")).toContainText("RUN 02");
+  await expect(page.getByTestId("archive-count")).toHaveText("1 RUNS CAPTURED");
+  await expect(page.getByTestId("debug-panel")).toContainText("LAST manual");
   await expect.poll(async () => (await position(page)).x).toBeCloseTo(0, 1);
   await expect.poll(async () => (await position(page)).z).toBeCloseTo(6, 1);
+  await expect(page.getByTestId("debug-panel")).toContainText("GROUNDED true");
   await page.screenshot({ path: "test-results/foundation-chamber.png" });
+  await page.evaluate(() => document.exitPointerLock());
+  await expect(page.getByRole("button", { name: "RESUME", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "RESTART TIMELINE", exact: true }).click();
+  await page.getByRole("button", { name: "COLLAPSE + RESTART", exact: true }).click();
+  await expect(page.getByRole("button", { name: "BEGIN CALIBRATION" })).toBeVisible();
+  await expect(page.getByTestId("archive-count")).toHaveText("0 RUNS CAPTURED");
+  await expect(page.getByTestId("run-number")).toContainText("RUN 01");
+  await page.goBack();
+  await page.getByRole("link", { name: "ENTER THE LOOP" }).click();
+  await expect(page.getByRole("button", { name: "BEGIN CALIBRATION" })).toBeVisible();
+  await expect(page.getByTestId("archive-count")).toHaveText("0 RUNS CAPTURED");
+  expect(errors).toEqual([]);
+});
+
+test("automatic timeout captures a bounded run and refresh collapses the timeline", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("dialog", (dialog) => dialog.accept());
+  await page.goto("/game");
+  await page.bringToFront();
+  await page.keyboard.press("Backquote");
+  await page.getByRole("button", { name: "BEGIN CALIBRATION" }).click();
+  await expect(page.getByTestId("run-number")).toContainText("RUN 02", { timeout: 55_000 });
+  await expect(page.getByTestId("archive-count")).toHaveText("1 RUNS CAPTURED");
+  await expect(page.getByTestId("debug-panel")).toContainText("LAST timeout / 30.000 s / 751 frames");
+  await page.reload();
+  await expect(page.getByRole("button", { name: "BEGIN CALIBRATION" })).toBeVisible();
+  await expect(page.getByTestId("run-number")).toContainText("RUN 01");
+  await expect(page.getByTestId("archive-count")).toHaveText("0 RUNS CAPTURED");
   expect(errors).toEqual([]);
 });
 

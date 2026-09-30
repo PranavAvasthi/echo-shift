@@ -10,12 +10,14 @@
 - Seven foundation tests pass. Real desktop Chromium verified jump/landing, movement, wall collision, pause freeze, and manual reset; mobile notice verified separately.
 - First browser pass exposed a zero-height scene wrapper and a pointer-lock cursor warp; both were fixed and regression-verified.
 - Phase 2 recorder module complete: 25 Hz timestamp grid, bracketing physics resampling, quaternion slerp, velocity/animation capture, precise partial endpoints, independent action timestamps, bounded duration, idempotent finish.
+- Phase 2 complete: actual collision-resolved player transforms are sampled after physics, partial/timeout runs are captured once, and a six-run archive remains in memory until restart/refresh.
+- All checks pass: strict TypeScript, ESLint, 26 unit tests, production build, and three Chromium integration tests.
+- Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working
-- Phase 2: wire the verified recorder to player simulation, archive runs in memory, verify manual/automatic recording and timeline restart in the browser.
+- Documentation and final foundation review. Next gameplay milestone: Phase 3, real recorded echo playback.
 
 ## Remaining
-- Phase 2: timestamped, fixed-rate replay recording and automated validation.
 - Phase 3: interpolation and actual recorded echo playback.
 - Phase 4: shared pressure plate, door, switch interaction model.
 - Phase 5: temporal run resets and echo creation.
@@ -28,10 +30,13 @@
 - Session state lives only in memory. No browser storage, cookies, accounts, or backend.
 - Primitive character/environment remain replaceable. Visual work stays minimal until the echo puzzle works.
 - TypeScript 5.9 is pinned because the current lint parser does not support TypeScript 7.
+- Transform samples come from post-physics observations. Actions retain their own timestamp stream and are never quantized to transform samples.
+- Partial runs retain their precise final frame for later endpoint holding. This build does not implement or fake that echo behavior.
+- A newly mounted game route starts fresh state; leaving the calibration route disposes its runtime. Preferences remain in memory only.
 - Next.js App Router provides `/` and `/game`; gameplay is client-only and lazy loaded.
 
 ## Known issues / verification
 - Current chamber is a movement test, not yet the cooperative puzzle. Doorway is open; floor marker and prism are non-interactive.
-- Chromium browser tests require a focused desktop window on macOS; headless pointer lock was rejected. Tests use native graphics.
+- Browser tests use full headless Chromium (`channel: chromium`). The smaller headless-shell rejected native pointer lock; full Chromium now verifies it without capturing the desktop mouse.
 - R3F currently emits a single upstream Three.js Clock deprecation notice; Rapier emits a single WASM initialization deprecation notice. No application runtime errors observed.
 - This initial delivery targets Phases 1 and 2, not the full game described in the roadmap.

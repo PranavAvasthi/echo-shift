@@ -23,7 +23,7 @@ export function Player({ runtime }: { runtime: GameRuntime }) {
   }, [world]);
 
   useEffect(() => {
-    runtime.reset();
+    runtime.reset(useGameStore.getState().run);
     publishAt.current = 0;
     body.current?.setTranslation(SPAWN, true);
     body.current?.setNextKinematicTranslation(SPAWN);
@@ -56,11 +56,12 @@ export function Player({ runtime }: { runtime: GameRuntime }) {
     if (!body.current || useGameStore.getState().phase !== "playing") return;
     Object.assign(runtime.position, body.current.translation());
     const elapsed = runtime.clock.elapsed;
+    runtime.recorder.observe(elapsed, runtime.pose());
     if (elapsed >= publishAt.current) {
-      useGameStore.getState().telemetry(elapsed, 0);
+      useGameStore.getState().telemetry(elapsed, runtime.recorder.frameCount);
       publishAt.current = elapsed + 0.1;
     }
-    if (elapsed >= RUN_DURATION) useGameStore.getState().requestReset();
+    if (elapsed >= RUN_DURATION) useGameStore.getState().requestReset("timeout");
   });
 
   return (

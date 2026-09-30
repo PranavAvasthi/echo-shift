@@ -73,4 +73,9 @@ describe("phase machine", () => {
     useGameStore.getState().restartTimeline();
     expect(useGameStore.getState()).toMatchObject({ phase: "intro", run: 1, elapsed: 0 });
   });
+  it("a newly mounted session cannot inherit the disposed runtime's progress", () => {
+    useGameStore.setState({ phase: "paused", run: 4, elapsed: 10, archivedRuns: 3 });
+    useGameStore.getState().openSession();
+    expect(useGameStore.getState()).toMatchObject({ phase: "loading", run: 1, elapsed: 0, archivedRuns: 0, latestRecording: null });
+  });
 });

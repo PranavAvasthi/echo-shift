@@ -22,6 +22,9 @@ export default function GameClient() {
     let active = true;
     queueMicrotask(() => {
       if (!active) return;
+      // A newly mounted calibration owns a new runtime. Match the UI store to
+      // it when navigating back from the landing route, not just on refresh.
+      useGameStore.getState().openSession();
       useGameStore.getState().configure({ reduceMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches });
       if (window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 700) { setRendererStatus("mobile"); return; }
       try {
@@ -42,6 +45,8 @@ export default function GameClient() {
     }
     if (phase !== "runResetting") return;
     runtime.clearInput();
+    runtime.capture(useGameStore.getState().resetReason);
+    useGameStore.getState().captured(runtime.timeline.count, runtime.timeline.summary());
     const timer = window.setTimeout(() => useGameStore.getState().finishReset(Boolean(document.pointerLockElement) && !document.hidden), 1200);
     return () => window.clearTimeout(timer);
   }, [phase, runtime]);
