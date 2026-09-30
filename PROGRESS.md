@@ -9,9 +9,10 @@
 - Added input cleanup on pause/focus loss, pointer lock, mobile notice, WebGL failure handling, minimal HUD, and session-only settings.
 - Seven foundation tests pass. Real desktop Chromium verified jump/landing, movement, wall collision, pause freeze, and manual reset; mobile notice verified separately.
 - First browser pass exposed a zero-height scene wrapper and a pointer-lock cursor warp; both were fixed and regression-verified.
+- Phase 2 recorder module complete: 25 Hz timestamp grid, bracketing physics resampling, quaternion slerp, velocity/animation capture, precise partial endpoints, independent action timestamps, bounded duration, idempotent finish.
 
 ## Currently working
-- Phase 2: timestamped replay structures, fixed-rate recorder, recording validation.
+- Phase 2: wire the verified recorder to player simulation, archive runs in memory, verify manual/automatic recording and timeline restart in the browser.
 
 ## Remaining
 - Phase 2: timestamped, fixed-rate replay recording and automated validation.
