@@ -13,10 +13,12 @@
 - Phase 2 complete: actual collision-resolved player transforms are sampled after physics, partial/timeout runs are captured once, and a six-run archive remains in memory until restart/refresh.
 - All checks pass: strict TypeScript, ESLint, 27 unit tests, production build, and three Chromium integration tests.
 - Final movement review found that discrete gravity reduced jump clearance below the 1.1m training platform. Raised the impulse slightly and verified an actual platform jump/landing in Chromium, with a clearance regression test.
+- Documented controls, setup/deployment, architecture diagram, replay design, performance decisions, limitations, and an actual browser screenshot in README.md.
 - Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working
-- Documentation and final foundation review. Next gameplay milestone: Phase 3, real recorded echo playback.
+- Phase 1 + Phase 2 foundation verified and ready for review.
+- Next gameplay milestone: Phase 3, real recorded echo playback, followed by the first shared pressure-plate/door puzzle.
 
 ## Remaining
 - Phase 3: interpolation and actual recorded echo playback.
