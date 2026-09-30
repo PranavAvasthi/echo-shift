@@ -34,6 +34,6 @@ export function Door({ runtime }: { runtime: GameRuntime }) {
       <mesh position={[0, 1.6, .17]}><boxGeometry args={[.04, 2.8, .02]} /><meshBasicMaterial ref={light} color="#ff4057" /></mesh>
       {[-1.4, 1.4].map((side) => <mesh key={side} position={[side, 1.6, .18]}><boxGeometry args={[.05, 2.8, .03]} /><meshBasicMaterial color="#718191" /></mesh>)}
     </group>
-    <Html position={[0, 3.45, .25]} center distanceFactor={12} zIndexRange={[1, 0]} style={{ pointerEvents: "none" }}><span className="world-label">TEMPORAL GATE<small>PRESSURE LINK / {levels[levelIndex].plates.map((plate) => plate.label).join(" + ")}</small></span></Html>
+    <Html position={[0, 2.55, .25]} center distanceFactor={12} zIndexRange={[1, 0]} style={{ pointerEvents: "none" }}><span className="world-label">TEMPORAL GATE<small>PRESSURE LINK / {levels[levelIndex].plates.map((plate) => plate.label).join(" + ")}</small></span></Html>
   </group>;
 }

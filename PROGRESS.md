@@ -1,6 +1,7 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Gameplay HUD focuses on puzzle state; technical frame counts appear only with the development debug panel. Lowered the gate label to avoid covering the timer. TypeScript, lint, and a fresh real-browser two-chamber playthrough pass.
 - Dual Core is playable after the first chamber: two distant plates, a 40-second run limit, two real echoes working simultaneously, chamber progression, session totals, final prototype completion, and a full timeline restart.
 - Latest full verification: strict TypeScript, ESLint, 49 unit tests, production build, and all four browser tests pass. The browser campaign solves both chambers in five real loops without teleporting players or scripting clones.
 - Screenshot review caught world-label stacking above the HUD/overlays; lowered all world labels beneath UI panels and checked TypeScript/lint.
@@ -26,11 +27,11 @@
 - Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working
-- Final documentation and screenshots for the two-chamber playable prototype.
+- Finishing HUD readability and browser screenshots for the two-chamber playable prototype.
 
 ## Remaining
 - Reusable switches, cube relay, security timing, and remaining campaign levels.
-- Phases 6–11: tutorial, five levels, visual polish, original audio, full UX, profiling.
+- Remaining campaign, final facility art, original audio, full settings, and profiling.
 
 ## Architecture decisions
 - Gameplay simulation lives outside React UI; mutable transforms use refs.
@@ -39,8 +40,8 @@
 - Primitive character/environment remain replaceable. Visual work stays minimal until the echo puzzle works.
 - TypeScript 5.9 is pinned because the current lint parser does not support TypeScript 7.
 - Transform samples come from post-physics observations. Actions retain their own timestamp stream and are never quantized to transform samples.
-- Partial runs retain their precise final frame for later endpoint holding. This build does not implement or fake that echo behavior.
-- A newly mounted game route starts fresh state; leaving the calibration route disposes its runtime. Preferences remain in memory only.
+- Partial runs retain their precise final frame; actual playback holds that endpoint so deliberately short plate recordings work. No scripted clones are used.
+- A newly mounted game route starts fresh state; leaving the game route disposes its runtime. Preferences remain in memory only.
 - Chamber changes clear local recordings and entity occupancy while retaining session time/loop totals. A full timeline restart clears both chambers and all session totals.
 - Next.js App Router provides `/` and `/game`; gameplay is client-only and lazy loaded.
 
