@@ -4,6 +4,7 @@ import { PlayerController } from "@/game/player/PlayerController";
 import type { PlayerAnimation } from "@/game/player/player.types";
 import { ReplayRecorder } from "@/game/replay/ReplayRecorder";
 import { RunTimeline } from "@/game/replay/RunTimeline";
+import { ReplayPlayer } from "@/game/replay/ReplayPlayer";
 import type { PlayerPose, RunEndReason } from "@/game/replay/replay.types";
 
 /** Owned by a mounted game, never persisted. Frame-level data bypasses React. */
@@ -14,6 +15,7 @@ export class GameRuntime {
   readonly timeline = new RunTimeline();
   readonly position = { ...SPAWN };
   readonly keys = new Set<string>();
+  echoes: ReplayPlayer[] = [];
   yaw = 0;
   pitch = 0.32;
   jumpQueued = false;
@@ -44,6 +46,7 @@ export class GameRuntime {
     this.clearInput();
     this.animation = "idle";
     if (runId === 1) this.timeline.clear();
+    this.echoes = this.timeline.recordings.map((run) => new ReplayPlayer(run));
     this.recorder.start(runId, "lab00-calibration", this.pose());
   }
 }

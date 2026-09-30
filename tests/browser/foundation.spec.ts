@@ -61,6 +61,8 @@ test("actual WebGL room: movement, jumping, collision, pause and manual reset", 
   await expect(page.getByTestId("run-number")).toContainText("RUN 02");
   await expect(page.getByTestId("archive-count")).toHaveText("1 RUNS CAPTURED");
   await expect(page.getByTestId("debug-panel")).toContainText("LAST manual");
+  await expect(page.getByTestId("echo-1")).toHaveCount(1);
+  await expect(page.getByTestId("debug-panel")).toContainText("ECHOES 1");
   await expect.poll(async () => (await position(page)).x).toBeCloseTo(0, 1);
   await expect.poll(async () => (await position(page)).z).toBeCloseTo(6, 1);
   await expect(page.getByTestId("debug-panel")).toContainText("GROUNDED true");
@@ -71,6 +73,7 @@ test("actual WebGL room: movement, jumping, collision, pause and manual reset", 
   await page.getByRole("button", { name: "COLLAPSE + RESTART", exact: true }).click();
   await expect(page.getByRole("button", { name: "BEGIN CALIBRATION" })).toBeVisible();
   await expect(page.getByTestId("archive-count")).toHaveText("0 RUNS CAPTURED");
+  await expect(page.getByTestId("echo-1")).toHaveCount(0);
   await expect(page.getByTestId("run-number")).toContainText("RUN 01");
   await page.goBack();
   await page.getByRole("link", { name: "ENTER THE LOOP" }).click();

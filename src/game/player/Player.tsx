@@ -56,6 +56,7 @@ export function Player({ runtime }: { runtime: GameRuntime }) {
     if (!body.current || useGameStore.getState().phase !== "playing") return;
     Object.assign(runtime.position, body.current.translation());
     const elapsed = runtime.clock.elapsed;
+    for (const echo of runtime.echoes) echo.sample(elapsed);
     runtime.recorder.observe(elapsed, runtime.pose());
     if (elapsed >= publishAt.current) {
       useGameStore.getState().telemetry(elapsed, runtime.recorder.frameCount);

@@ -278,6 +278,8 @@ h1 span {
   background: #f4f7fa99;
   border-radius: 50%;
 }
+.echo-label { display: block; text-align: center; white-space: nowrap; color: #b6f8ff; text-shadow: 0 0 12px #38e8ff; font: 10px "IBM Plex Mono", monospace; letter-spacing: .12em; }
+.echo-label small { display: block; margin-top: 5px; font-size: 7px; color: #62f3ff; }
 .debug-panel {
   position: absolute;
   top: 110px;

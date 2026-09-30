@@ -22,7 +22,7 @@ export function GameHUD({ runtime }: { runtime: GameRuntime }) {
       <div className="hud-bottom">
         <div className="controls">W A S D / MOVE · MOUSE / LOOK<br />SPACE / JUMP · SHIFT / SPRINT<br />R / END RUN · ESC / PAUSE</div>
         <div className="hud-run" data-testid="run-number">RUN {String(run).padStart(2, "0")}<div className="timeline" aria-hidden="true">{Array.from({ length: Math.min(run, 7) }, (_, i) => <span key={i} className={`timeline-dot ${i === Math.min(run, 7) - 1 ? "current" : "recorded"}`} />)}</div></div>
-        <div className="hud-label hud-right">FOUNDATION BUILD 0.1<br />MOVEMENT + RECORDING TEST<br />ECHO PLAYBACK COMING NEXT</div>
+        <div className="hud-label hud-right">YOUR PAST REMAINS<br />{Math.max(0, Math.min(run - 1, 6))} ACTIVE ECHOES</div>
       </div>
       {process.env.NODE_ENV === "development" && debug && <DebugPanel runtime={runtime} />}
     </div>
@@ -37,7 +37,8 @@ function DebugPanel({ runtime }: { runtime: GameRuntime }) {
       const state = useGameStore.getState();
       const last = runtime.timeline.summary();
       const archive = last ? `\nARCHIVED ${runtime.timeline.count} / TOTAL ${runtime.timeline.totalRuns}\nLAST ${last.endReason} / ${last.duration.toFixed(3)} s / ${last.frameCount} frames\nEND ${last.end.x.toFixed(2)} ${last.end.y.toFixed(2)} ${last.end.z.toFixed(2)}` : "\nARCHIVED 0";
-      setReport(`FPS ${Math.round(1000 / Math.max(runtime.frameTime, 1))} / ${runtime.frameTime.toFixed(1)} ms\nPLAYER ${x.toFixed(2)} ${y.toFixed(2)} ${z.toFixed(2)}\nGROUNDED ${runtime.controller.grounded}\nYAW ${runtime.yaw.toFixed(3)} / KEYS ${[...runtime.keys].join(",")}\nLAB 00 / RUN ${state.run}\nTIME ${runtime.clock.elapsed.toFixed(3)}\nFRAMES ${state.recordedFrames}\nECHOES 0\nDRAW CALLS ${runtime.drawCalls}\nTRIANGLES ${runtime.triangles}\nPHASE ${state.phase}${archive}`);
+      const echoes = runtime.echoes.map((echo) => `\nECHO ${echo.run.runId} ${echo.pose.position.x.toFixed(2)} ${echo.pose.position.y.toFixed(2)} ${echo.pose.position.z.toFixed(2)}`).join("");
+      setReport(`FPS ${Math.round(1000 / Math.max(runtime.frameTime, 1))} / ${runtime.frameTime.toFixed(1)} ms\nPLAYER ${x.toFixed(2)} ${y.toFixed(2)} ${z.toFixed(2)}\nGROUNDED ${runtime.controller.grounded}\nYAW ${runtime.yaw.toFixed(3)} / KEYS ${[...runtime.keys].join(",")}\nLAB 00 / RUN ${state.run}\nTIME ${runtime.clock.elapsed.toFixed(3)}\nFRAMES ${state.recordedFrames}\nECHOES ${runtime.echoes.length}\nDRAW CALLS ${runtime.drawCalls}\nTRIANGLES ${runtime.triangles}\nPHASE ${state.phase}${archive}${echoes}`);
     };
     refresh();
     const interval = window.setInterval(refresh, 250);

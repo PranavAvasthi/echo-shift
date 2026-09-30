@@ -1,6 +1,8 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Phase 3: actual recorded echo playback, timestamp position interpolation and quaternion slerp, end-pose holding, action crossing/rewind handling, multiple independent replays, shared player/echo character model.
+- Playback validation: 37 total unit tests and the movement/echo browser regression pass; TypeScript, ESLint and production build pass.
 - Inspected repository: empty Git repository, no existing application or instructions.
 - Selected React 19 / React Three Fiber 9 / Rapier 2 compatible foundation.
 - Initialized Next.js App Router, strict TypeScript, lint tooling, and session-aware landing screen.
@@ -17,11 +19,9 @@
 - Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working
-- Phase 1 + Phase 2 foundation verified and ready for review.
-- Next gameplay milestone: Phase 3, real recorded echo playback, followed by the first shared pressure-plate/door puzzle.
+- Building the first actual cooperative puzzle: shared pressure plate, physical door, reachable objective, tutorial hints, and a completion reward.
 
 ## Remaining
-- Phase 3: interpolation and actual recorded echo playback.
 - Phase 4: shared pressure plate, door, switch interaction model.
 - Phase 5: temporal run resets and echo creation.
 - Prove the one-room cooperative puzzle before building any remaining levels.

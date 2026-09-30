@@ -7,6 +7,7 @@ import { PCFShadowMap } from "three";
 import { Facility } from "./environment/Facility";
 import { Player } from "./player/Player";
 import { PlayerCamera } from "./player/PlayerCamera";
+import { EchoFleet } from "./replay/Echo";
 import type { GameRuntime } from "./core/GameRuntime";
 import { PHYSICS_STEP } from "./core/constants";
 import { useGameStore } from "./state/gameStore";
@@ -36,6 +37,7 @@ export default function GameScene({ runtime, onContextLost }: { runtime: GameRun
           <Ready />
         </Physics>
         <PlayerCamera runtime={runtime} />
+        <EchoFleet runtime={runtime} />
       </Suspense>
     </Canvas>
   );
