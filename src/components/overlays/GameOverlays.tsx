@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useGameStore } from "@/game/state/gameStore";
+import { levels } from "@/game/levels";
 
 export function LoadingScreen() {
   return <div className="screen" role="status"><div className="screen-panel"><p className="eyebrow">SYSTEM INITIALIZING</p><h2>CALIBRATING<br />TEMPORAL FIELD</h2><p>Loading renderer and physics environment…</p></div></div>;
@@ -18,12 +19,13 @@ export function GameOverlays({ resume, pointerError }: { resume: () => void; poi
   const phase = useGameStore((s) => s.phase);
   const reduceMotion = useGameStore((s) => s.reduceMotion);
   const run = useGameStore((s) => s.run);
+  const levelIndex = useGameStore((s) => s.levelIndex);
   if (phase === "loading") return <LoadingScreen />;
   if (phase === "intro") return (
     <div className="screen"><div className="screen-panel">
-      <p className="eyebrow">LAB 00 / THE FIRST LOOP</p><h2>YOUR PAST<br />REMAINS.</h2>
-      <p>A locked door. A pressure plate. Only one of you.<br />For now.</p>
-      <p>Reach the violet core beyond the gate. Each reset leaves a hologram replaying your actual moves. End a run on the plate, then cooperate with your past self.</p>
+      <p className="eyebrow">LAB {String(levelIndex).padStart(2, "0")} / {levels[levelIndex].name}</p><h2>{levelIndex === 0 ? <>YOUR PAST<br />REMAINS.</> : <>TWO PLATES.<br />THREE OF YOU.</>}</h2>
+      <p>{levelIndex === 0 ? <>A locked door. A pressure plate. Only one of you.<br />For now.</> : <>Two separated pressure plates power the gate.<br />Both must stay active when you leave.</>}</p>
+      <p>{levelIndex === 0 ? "Reach the violet core beyond the gate. Each reset leaves a hologram replaying your actual moves. End a run on the plate, then cooperate with your past self." : "Leave one echo holding Plate A. Leave another holding Plate B. On your third run, reach the core while your past selves work together."}</p>
       <p className="notice">Refreshing destroys this timeline.</p>
       <button className="primary-button" onClick={resume}>BEGIN EXPERIMENT <span aria-hidden="true">↗</span></button>
       <p className="build-note">WASD / MOVE · SPACE / JUMP · SHIFT / SPRINT<br />MOUSE / LOOK · R / LEAVE ECHO · E / INTERACT · ESC / PAUSE</p>
@@ -32,7 +34,7 @@ export function GameOverlays({ resume, pointerError }: { resume: () => void; poi
   );
   if (phase === "paused") return <PauseMenu resume={resume} pointerError={pointerError} />;
   if (phase === "runResetting") return <div className={`reset-effect${reduceMotion ? " still" : ""}`} role="status"><div><p className="eyebrow">YOUR PAST REMAINS</p><h2>RUN {String(run + 1).padStart(2, "0")}</h2><p>Echo {String(run).padStart(2, "0")} materializing</p></div></div>;
-  if (phase === "levelComplete") return <VictoryScreen />;
+  if (phase === "levelComplete" || phase === "gameComplete") return <VictoryScreen />;
   return null;
 }
 
@@ -63,13 +65,18 @@ function VictoryScreen() {
   const run = useGameStore((s) => s.run);
   const time = useGameStore((s) => s.sessionElapsed);
   const echoes = useGameStore((s) => s.puzzle.echoCount);
+  const levelIndex = useGameStore((s) => s.levelIndex);
+  const totalLoops = useGameStore((s) => s.totalLoops);
+  const hasNextLevel = levelIndex + 1 < levels.length;
+  const ideal = levels[levelIndex].expectedRuns;
   return <div className="screen victory-screen"><div className="screen-panel">
-    <p className="eyebrow">TEMPORAL CORE SECURED</p><h2>TIMELINE<br />STABLE.</h2>
+    <p className="eyebrow">{hasNextLevel ? "TEMPORAL CORE SECURED" : `${levels.length} CHAMBERS CLEARED`}</p><h2>TIMELINE<br />STABLE.</h2>
     <p>You held the door open with your own past.<br />Every hologram was a decision you made.</p>
-    <div className="victory-stats"><span>{run}<small>TEMPORAL LOOPS</small></span><span>{time.toFixed(1)}s<small>ACTIVE SESSION TIME</small></span><span>{echoes}<small>COOPERATING ECHOES</small></span></div>
-    <p className="notice">{run <= 2 ? "PERFECT SYNC / SOLVED IN TWO LOOPS" : "STABLE / CAN YOU SOLVE IT IN TWO LOOPS?"}</p>
-    <button className="primary-button" onClick={() => useGameStore.getState().restartTimeline()}>BEGIN NEW TIMELINE <span aria-hidden="true">↗</span></button>
+    <div className="victory-stats"><span data-testid="total-loops">{totalLoops}<small>TOTAL TEMPORAL LOOPS</small></span><span>{time.toFixed(1)}s<small>ACTIVE SESSION TIME</small></span><span>{echoes}<small>COOPERATING ECHOES</small></span></div>
+    <p className="notice">{run <= ideal ? `PERFECT SYNC / SOLVED IN ${ideal === 2 ? "TWO" : "THREE"} LOOPS` : `STABLE / CAN YOU SOLVE IT IN ${ideal} LOOPS?`}</p>
+    {hasNextLevel && <button className="primary-button" onClick={() => useGameStore.getState().advanceLevel()}>ENTER {levels[levelIndex + 1].name} <span aria-hidden="true">↗</span></button>}
+    <button className={hasNextLevel ? "secondary-button" : "primary-button"} onClick={() => useGameStore.getState().restartTimeline()}>BEGIN NEW TIMELINE <span aria-hidden="true">↗</span></button>
     <Link className="secondary-button" href="/">COLLAPSE TIMELINE</Link>
-    <p className="build-note">FIRST COOPERATIVE CHAMBER COMPLETE<br />THE FULL FIVE-LEVEL CAMPAIGN IS STILL IN DEVELOPMENT.</p>
+    <p className="build-note">{hasNextLevel ? "NEXT: COORDINATE MULTIPLE PAST SELVES" : "TWO-CHAMBER PROTOTYPE COMPLETE"}<br />THE FULL FIVE-LEVEL CAMPAIGN IS STILL IN DEVELOPMENT.</p>
   </div></div>;
 }

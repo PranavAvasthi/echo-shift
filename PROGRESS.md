@@ -1,6 +1,8 @@
 # ECHO//SHIFT — development log
 
 ## Completed
+- Dual Core is playable after the first chamber: two distant plates, a 40-second run limit, two real echoes working simultaneously, chamber progression, session totals, final prototype completion, and a full timeline restart.
+- Latest full verification: strict TypeScript, ESLint, 49 unit tests, production build, and all four browser tests pass. The browser campaign solves both chambers in five real loops without teleporting players or scripting clones.
 - Screenshot review caught world-label stacking above the HUD/overlays; lowered all world labels beneath UI panels and checked TypeScript/lint.
 - First cooperative chamber is playable end-to-end: physical gate, glowing shared plate, E-activated core, evolving tutorial hints, actual recorded echoes, reset effect, and victory/replay screen.
 - Verified in Chromium without teleporting or scripting echoes: discover plate → leave it → collide with shut gate → record a partial run ending on plate → past self replays and holds → current self crosses → core activation → victory → clean restart.
@@ -24,7 +26,7 @@
 - Browser verification covers recorded frame growth, manual capture, exact 30.000-second/751-frame timeout capture, restart confirmation, client-route re-entry, refresh collapse, and mobile fallback.
 
 ## Currently working
-- First cooperative prototype verified. Preparing a second challenge that requires two recorded selves simultaneously.
+- Final documentation and screenshots for the two-chamber playable prototype.
 
 ## Remaining
 - Reusable switches, cube relay, security timing, and remaining campaign levels.
@@ -39,10 +41,11 @@
 - Transform samples come from post-physics observations. Actions retain their own timestamp stream and are never quantized to transform samples.
 - Partial runs retain their precise final frame for later endpoint holding. This build does not implement or fake that echo behavior.
 - A newly mounted game route starts fresh state; leaving the calibration route disposes its runtime. Preferences remain in memory only.
+- Chamber changes clear local recordings and entity occupancy while retaining session time/loop totals. A full timeline restart clears both chambers and all session totals.
 - Next.js App Router provides `/` and `/game`; gameplay is client-only and lazy loaded.
 
 ## Known issues / verification
 - Environment remains a deliberately small grey-box prototype; final facility art, spatial audio, campaign, and profiling remain unfinished.
 - Browser tests use full headless Chromium (`channel: chromium`). The smaller headless-shell rejected native pointer lock; full Chromium now verifies it without capturing the desktop mouse.
 - R3F currently emits a single upstream Three.js Clock deprecation notice; Rapier emits a single WASM initialization deprecation notice. No application runtime errors observed.
-- The first puzzle is complete; the full five-level campaign is still in development.
+- Two playable chambers are complete; the full five-level campaign is still in development.

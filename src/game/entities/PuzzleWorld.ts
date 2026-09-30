@@ -49,9 +49,11 @@ export class PuzzleWorld {
     const holding = [...this.occupants.values()].flat();
     let hint = "Find the cyan pressure plate. The door needs someone to stay behind.";
     if (this.discoveredPlate) hint = "The door closes when you leave. Return to the plate and press R.";
-    if (echoCount) hint = "Your echo repeats your path. End a recording while standing on the plate.";
+    if (echoCount) hint = "Your echo repeats your path. End a recording while standing on a plate.";
+    if (this.level.plates.length > 1 && !this.doorOpen) hint = "Both plates must stay powered. Leave an echo on each plate.";
     if (holding.some((source) => source.type === "player")) hint = "Stay on the plate. Press R to leave your past self here.";
-    if (this.doorOpen && holding.some((source) => source.type === "echo")) hint = "YOUR PAST REMAINS. Take the open door while your echo holds the plate.";
+    const echoesHoldDoor = this.level.door.requirements.every((id) => this.occupants.get(id)?.some((source) => source.type === "echo"));
+    if (this.doorOpen && echoesHoldDoor) hint = "YOUR PAST REMAINS. Take the open door while your echoes hold the plates.";
     if (this.playerBeyondDoor) hint = "Reach the violet core. Press E to stabilize the timeline.";
     if (this.canActivate) hint = "[E] STABILIZE THE CORE";
     return { plates, doorOpen: this.doorOpen, canActivate: this.canActivate, hint, echoCount };

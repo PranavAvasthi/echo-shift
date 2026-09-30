@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { GameRuntime } from "./core/GameRuntime";
 import { usePlayerInput } from "./player/usePlayerInput";
 import { useGameStore } from "./state/gameStore";
+import { levels } from "./levels";
 import { GameHUD } from "@/components/hud/GameHUD";
 import { DesktopRequired, GameOverlays, LoadingScreen, RendererError } from "@/components/overlays/GameOverlays";
 import { RendererBoundary } from "@/components/ui/RendererBoundary";
@@ -39,14 +40,15 @@ export default function GameClient() {
   }, []);
 
   useEffect(() => {
-    if (phase === "paused" || phase === "intro" || phase === "levelComplete") {
+    if (phase === "paused" || phase === "intro" || phase === "levelComplete" || phase === "gameComplete") {
       runtime.clearInput();
       if (document.pointerLockElement) document.exitPointerLock();
     }
+    if (phase === "levelComplete" && useGameStore.getState().levelIndex === levels.length - 1) useGameStore.getState().transition("gameComplete");
     if (phase !== "runResetting") return;
     runtime.clearInput();
     runtime.capture(useGameStore.getState().resetReason);
-    useGameStore.getState().captured(runtime.timeline.count, runtime.timeline.summary());
+    useGameStore.getState().captured(runtime.timeline.count, runtime.timeline.summary(), runtime.sessionLoops);
     const timer = window.setTimeout(() => useGameStore.getState().finishReset(Boolean(document.pointerLockElement) && !document.hidden), 1200);
     return () => window.clearTimeout(timer);
   }, [phase, runtime]);

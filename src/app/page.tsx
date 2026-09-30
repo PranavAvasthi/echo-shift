@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="landing">
-      <header className="landing-header"><span>TRD / EXPERIMENT 001</span><span>THE FIRST LOOP · PLAYABLE PROTOTYPE</span></header>
+      <header className="landing-header"><span>TRD / EXPERIMENT 001</span><span>TWO CHAMBERS · ONE TIMELINE</span></header>
       <section className="landing-content">
         <p className="eyebrow">TEMPORAL SESSION DETECTED</p>
         <h1>ECHO<span>{"//"}</span>SHIFT</h1>

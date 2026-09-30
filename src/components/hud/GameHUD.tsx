@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { GameRuntime } from "@/game/core/GameRuntime";
-import { RUN_DURATION } from "@/game/core/constants";
+import { levels } from "@/game/levels";
 import { useGameStore } from "@/game/state/gameStore";
 
 export function GameHUD({ runtime }: { runtime: GameRuntime }) {
@@ -11,11 +11,13 @@ export function GameHUD({ runtime }: { runtime: GameRuntime }) {
   const phase = useGameStore((s) => s.phase);
   const debug = useGameStore((s) => s.debug);
   const puzzle = useGameStore((s) => s.puzzle);
-  const remaining = Math.max(0, Math.ceil(RUN_DURATION - elapsed));
+  const levelIndex = useGameStore((s) => s.levelIndex);
+  const level = levels[levelIndex];
+  const remaining = Math.max(0, Math.ceil(level.runDuration - elapsed));
   return (
     <div className="hud" aria-label="Game status">
       <div className="hud-top">
-        <div><div className="hud-logo">ECHO<span>{"//"}</span>SHIFT</div><div className="hud-label">LAB 00 / YOUR PAST REMAINS<br />TEMPORAL RESEARCH DIVISION</div><div className={`gate-status ${puzzle.doorOpen ? "active" : ""}`} data-testid="gate-state">GATE {puzzle.doorOpen ? "OPEN" : "LOCKED"}</div>{puzzle.plates.map((plate) => <div key={plate.id} className="hud-label" data-testid={`plate-${plate.label.toLowerCase()}`}>PLATE {plate.label} / {plate.active ? plate.occupants.join(" + ") : "EMPTY"}</div>)}</div>
+        <div><div className="hud-logo">ECHO<span>{"//"}</span>SHIFT</div><div className="hud-label" data-testid="lab-name">LAB {String(levelIndex).padStart(2, "0")} / {level.name}<br />TEMPORAL RESEARCH DIVISION</div><div className={`gate-status ${puzzle.doorOpen ? "active" : ""}`} data-testid="gate-state">GATE {puzzle.doorOpen ? "OPEN" : "LOCKED"}</div>{puzzle.plates.map((plate) => <div key={plate.id} className="hud-label" data-testid={`plate-${plate.label.toLowerCase()}`}>PLATE {plate.label} / {plate.active ? plate.occupants.join(" + ") : "EMPTY"}</div>)}</div>
         <div><div className="hud-time" data-testid="timer">00:{String(remaining).padStart(2, "0")}</div><div className="hud-label">RUN TIME REMAINING</div></div>
         <div className="hud-right"><div className="hud-label accent">TEMPORAL SESSION ACTIVE</div><div className="hud-label"><span className="recording-light" />{phase === "playing" ? "RECORDING" : "STANDBY"}</div><div className="hud-label" data-testid="frame-count">{frames} FRAMES / 25 Hz</div><div className="hud-label" data-testid="archive-count">{archivedRuns} RUNS CAPTURED</div></div>
       </div>
@@ -41,7 +43,19 @@ function DebugPanel({ runtime }: { runtime: GameRuntime }) {
       const last = runtime.timeline.summary();
       const archive = last ? `\nARCHIVED ${runtime.timeline.count} / TOTAL ${runtime.timeline.totalRuns}\nLAST ${last.endReason} / ${last.duration.toFixed(3)} s / ${last.frameCount} frames\nEND ${last.end.x.toFixed(2)} ${last.end.y.toFixed(2)} ${last.end.z.toFixed(2)}` : "\nARCHIVED 0";
       const echoes = runtime.echoes.map((echo) => `\nECHO ${echo.run.runId} ${echo.pose.position.x.toFixed(2)} ${echo.pose.position.y.toFixed(2)} ${echo.pose.position.z.toFixed(2)}`).join("");
-      setReport(`FPS ${Math.round(1000 / Math.max(runtime.frameTime, 1))} / ${runtime.frameTime.toFixed(1)} ms\nPLAYER ${x.toFixed(2)} ${y.toFixed(2)} ${z.toFixed(2)}\nGROUNDED ${runtime.controller.grounded}\nYAW ${runtime.yaw.toFixed(3)} / KEYS ${[...runtime.keys].join(",")}\nLAB 00 / RUN ${state.run}\nTIME ${runtime.clock.elapsed.toFixed(3)}\nFRAMES ${state.recordedFrames}\nECHOES ${runtime.echoes.length}\nDRAW CALLS ${runtime.drawCalls}\nTRIANGLES ${runtime.triangles}\nPHASE ${state.phase}${archive}${echoes}`);
+      setReport([
+        `FPS ${Math.round(1000 / Math.max(runtime.frameTime, 1))} / ${runtime.frameTime.toFixed(1)} ms`,
+        `PLAYER ${x.toFixed(2)} ${y.toFixed(2)} ${z.toFixed(2)}`,
+        `GROUNDED ${runtime.controller.grounded}`,
+        `YAW ${runtime.yaw.toFixed(3)} / KEYS ${[...runtime.keys].join(",")}`,
+        `LAB ${String(state.levelIndex).padStart(2, "0")} / RUN ${state.run}`,
+        `TIME ${runtime.clock.elapsed.toFixed(3)}`,
+        `FRAMES ${state.recordedFrames}`,
+        `ECHOES ${runtime.echoes.length}`,
+        `DRAW CALLS ${runtime.drawCalls}`,
+        `TRIANGLES ${runtime.triangles}`,
+        `PHASE ${state.phase}${archive}${echoes}`,
+      ].join("\n"));
     };
     refresh();
     const interval = window.setInterval(refresh, 250);

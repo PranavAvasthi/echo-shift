@@ -17,7 +17,7 @@ async function walkUntil(page: Page, key: string, axis: "x" | "z", target: numbe
   await page.waitForTimeout(180);
 }
 
-test("solve the first chamber with an actual recorded past self", async ({ page }) => {
+test("solve both chambers using one, then two, actually recorded past selves", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/game");
@@ -76,9 +76,43 @@ test("solve the first chamber with an actual recorded past self", async ({ page 
   await expect(page.getByText("PERFECT SYNC / SOLVED IN TWO LOOPS")).toBeVisible();
   await expect(page.getByTestId("debug-panel")).toContainText("PHASE levelComplete");
   await page.screenshot({ path: "test-results/cooperation-complete.png" });
+  await page.getByRole("button", { name: "ENTER DUAL CORE" }).click();
+  await expect(page.getByTestId("lab-name")).toContainText("DUAL CORE");
+  await expect(page.getByTestId("archive-count")).toHaveText("0 RUNS CAPTURED");
+  await expect(page.getByTestId("echo-1")).toHaveCount(0);
+  await page.getByRole("button", { name: "BEGIN EXPERIMENT" }).click();
+  await expect(page.getByTestId("timer")).toHaveText("00:40");
+  await walkUntil(page, "KeyA", "x", -3.5, "below");
+  await walkUntil(page, "KeyW", "z", 2.7, "below");
+  await expect(page.getByTestId("plate-a")).toContainText("YOU");
+  await expect(page.getByTestId("gate-state")).toHaveText("GATE LOCKED");
+  await page.keyboard.press("KeyR");
+  await expect(page.getByTestId("run-number")).toContainText("RUN 02");
+  await walkUntil(page, "KeyD", "x", 3.5, "above");
+  await walkUntil(page, "KeyW", "z", 2.7, "below");
+  await expect(page.getByTestId("plate-a")).toContainText("ECHO 01");
+  await expect(page.getByTestId("plate-b")).toContainText("YOU");
+  await expect(page.getByTestId("tutorial-hint")).toContainText("Press R");
+  await page.keyboard.press("KeyR");
+  await expect(page.getByTestId("run-number")).toContainText("RUN 03");
+  await expect(page.getByTestId("plate-a")).toContainText("ECHO 01");
+  await expect(page.getByTestId("plate-b")).toContainText("ECHO 02");
+  await expect(page.getByTestId("gate-state")).toHaveText("GATE OPEN");
+  await expect(page.getByTestId("echo-count")).toHaveText("2 ACTIVE ECHOES");
+  await page.screenshot({ path: "test-results/dual-core-echoes.png" });
+  await walkUntil(page, "KeyW", "z", -10.25, "below");
+  await expect(page.getByTestId("core-prompt")).toBeVisible();
+  await page.keyboard.press("KeyE");
+  await expect(page.getByRole("heading", { name: "TIMELINE STABLE." })).toBeVisible();
+  await expect(page.getByText("2 CHAMBERS CLEARED")).toBeVisible();
+  await expect(page.getByText("PERFECT SYNC / SOLVED IN THREE LOOPS")).toBeVisible();
+  await expect(page.getByTestId("total-loops")).toContainText(/^5/);
+  await expect(page.getByTestId("debug-panel")).toContainText("PHASE gameComplete");
+  await page.screenshot({ path: "test-results/dual-core-complete.png" });
   await page.getByRole("button", { name: "BEGIN NEW TIMELINE" }).click();
   await expect(page.getByRole("button", { name: "BEGIN EXPERIMENT" })).toBeVisible();
   await expect(page.getByTestId("echo-1")).toHaveCount(0);
   await expect(page.getByTestId("archive-count")).toHaveText("0 RUNS CAPTURED");
+  await expect(page.getByTestId("lab-name")).toContainText("YOUR PAST REMAINS");
   expect(errors).toEqual([]);
 });

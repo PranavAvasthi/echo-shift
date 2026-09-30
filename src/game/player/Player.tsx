@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { CapsuleCollider, RigidBody, useAfterPhysicsStep, useBeforePhysicsStep, useRapier, type RapierRigidBody } from "@react-three/rapier";
 import type { KinematicCharacterController } from "@dimforge/rapier3d-compat";
-import { PHYSICS_STEP, RUN_DURATION, SPAWN } from "@/game/core/constants";
+import { PHYSICS_STEP, SPAWN } from "@/game/core/constants";
 import type { GameRuntime } from "@/game/core/GameRuntime";
 import { useGameStore } from "@/game/state/gameStore";
 import { Operative } from "./Operative";
@@ -23,10 +23,11 @@ export function Player({ runtime }: { runtime: GameRuntime }) {
   }, [world]);
 
   useEffect(() => {
-    runtime.reset(useGameStore.getState().run);
+    const state = useGameStore.getState();
+    runtime.reset(state.run, state.levelIndex);
     publishAt.current = 0;
-    body.current?.setTranslation(SPAWN, true);
-    body.current?.setNextKinematicTranslation(SPAWN);
+    body.current?.setTranslation(runtime.position, true);
+    body.current?.setNextKinematicTranslation(runtime.position);
   }, [resetVersion, runtime]);
 
   useBeforePhysicsStep(() => {
@@ -66,7 +67,7 @@ export function Player({ runtime }: { runtime: GameRuntime }) {
       const state = useGameStore.getState();
       state.telemetry(elapsed, runtime.recorder.frameCount, runtime.world.snapshot(runtime.echoes.length), runtime.sessionElapsed);
       runtime.capture("levelComplete");
-      state.captured(runtime.timeline.count, runtime.timeline.summary());
+      state.captured(runtime.timeline.count, runtime.timeline.summary(), runtime.sessionLoops);
       state.transition("levelComplete");
       return;
     }
@@ -74,7 +75,7 @@ export function Player({ runtime }: { runtime: GameRuntime }) {
       useGameStore.getState().telemetry(elapsed, runtime.recorder.frameCount, runtime.world.snapshot(runtime.echoes.length), runtime.sessionElapsed);
       publishAt.current = elapsed + 0.1;
     }
-    if (elapsed >= RUN_DURATION) useGameStore.getState().requestReset("timeout");
+    if (elapsed >= runtime.world.level.runDuration) useGameStore.getState().requestReset("timeout");
   });
 
   return (
